@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import PWAWrapper from '@/components/PWAWrapper';
+import { PWAInstallProvider } from '@/components/PWAInstallProvider';
+
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,11 +28,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <header>
+  {/* lien vers le manifest */}
+  <link rel="manifest" href="/manifest.json" />
+  {/* facultatif : theme-color */}
+  <meta name="theme-color" content="#000000" />
+</header>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="bg-green-500 p-4">Test</div>,
-        {children}
+         <PWAWrapper />
+        <PWAInstallProvider>
+          {children}
+        </PWAInstallProvider>
       </body>
     </html>
   );
