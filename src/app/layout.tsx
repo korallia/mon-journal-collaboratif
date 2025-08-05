@@ -1,20 +1,12 @@
+
+
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import SessionWrapper from "./SessionWrapper";
 import './globals.css';
 import PWAWrapper from '@/components/PWAWrapper';
 import { PWAInstallProvider } from '@/components/PWAInstallProvider';
 
 
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -28,21 +20,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <header>
+      <head>
   {/* lien vers le manifest */}
   <link rel="manifest" href="/manifest.json" />
   {/* facultatif : theme-color */}
   <meta name="theme-color" content="#000000" />
-</header>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <div className="bg-green-500 p-4">Test</div>,
-         <PWAWrapper />
-        <PWAInstallProvider>
-          {children}
-        </PWAInstallProvider>
+</head>
+        <body className="min-h-screen">
+        <SessionWrapper>
+          <PWAWrapper />
+          <PWAInstallProvider>
+            {children}
+          </PWAInstallProvider>
+        </SessionWrapper>
       </body>
     </html>
+    
   );
 }
