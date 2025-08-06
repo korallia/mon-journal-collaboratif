@@ -38,7 +38,7 @@
     "next.config.ts",
     "types/**/*.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "prisma/seed.js"  ],
   "exclude": [
     "node_modules"
   ]
