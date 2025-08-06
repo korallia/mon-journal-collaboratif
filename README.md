@@ -38,3 +38,38 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 =======
 # mon-journal-collaboratif
 
+# 🗂️ Base de Données – Setup & Utilisation (Prisma + Data Proxy)
+
+Ce projet utilise **Prisma avec la Data Proxy** pour gérer la base de données PostgreSQL sans serveur local. Voici comment configurer, visualiser et interagir avec la base de données.
+
+---
+
+## 🔧 Prérequis
+- Node.js installé (v16+ recommandé)
+- Prisma installé localement (déjà dans ce projet via `devDependencies`)
+- Prisma Data Proxy configurée (clé API déjà dans le fichier `.env`)
+
+---
+
+## ⚙️ Étapes pour rendre la base fonctionnelle
+
+### Lancer la première migration (Créer les tables)
+```bash
+npx prisma migrate dev
+
+# 🛠️ Commandes Prisma – Gestion de la Base de Données
+
+Voici les commandes essentielles pour gérer la base de données Prisma dans ce projet.
+
+## 📋 Commandes utiles
+
+| Action                                      | Commande                  |
+| ------------------------------------------- | ------------------------- |
+| Appliquer les migrations                    | `npx prisma migrate dev`   |
+| Mettre à jour Prisma après un changement DB | `npx prisma db pull`       |
+| Visualiser la DB en interface graphique     | `npx prisma studio`        |
+
+---
+
+
+
