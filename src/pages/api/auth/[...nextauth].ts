@@ -1,26 +1,54 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaClient } from "@prisma/client";
+import { compare } from "bcryptjs";
 
-export default NextAuth({
+const prisma = new PrismaClient();
+
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        identifier: { label: "Email ou nom d'utilisateur", type: "text" },
+        password: { label: "Mot de passe", type: "password" },
       },
       async authorize(credentials) {
-        console.log("Tentative de connexion :", credentials);
-        // TEMP : On accepte tout pour le test
+        const { identifier, password } = credentials ?? {};
+
+        if (!identifier || !password) {
+          throw new Error("Identifiants manquants.");
+        }
+
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [{ email: identifier }, { name: identifier }],
+          },
+        });
+
+        if (!user) {
+          throw new Error("Utilisateur non trouvé");
+        }
+
+        const isValid = await compare(password, user.password);
+        if (!isValid) {
+          throw new Error("Mot de passe incorrect");
+        }
+
         return {
-          id: "1",
-          name: "Test User",
-          email: credentials?.email,
+          id: user.id,
+          name: user.name,
+          email: user.email,
         };
       },
     }),
   ],
+  pages: {
+    signIn: "/auth/login",
+  },
+  session: {
+    strategy: "jwt", // tu peux passer le string directement ici
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -29,12 +57,15 @@ export default NextAuth({
       return token;
     },
     async session({ session, token }) {
-      session.user = token.user as any;
+      session.user = token.user as {
+        id: string;
+        name?: string | null;
+        email?: string | null;
+      };
       return session;
     },
   },
-  pages: {
-    signIn: "/auth/login",  // Ta page custom de login
-  },
-});
+};
 
+// 💥 LA LIGNE QUI MANQUAIT
+export default NextAuth(authOptions);
