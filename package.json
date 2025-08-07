@@ -8,7 +8,8 @@
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md}'",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "jest"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -23,22 +24,28 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.11",
+    "@types/jest": "^30.0.0",
     "@types/minimatch": "^6.0.0",
     "@types/next-pwa": "^5.6.9",
-    "@types/node": "^20",
+    "@types/node": "^20.19.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/supertest": "^6.0.3",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",
     "eslint-config-next": "15.4.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.3.0",
+    "jest": "^30.0.5",
     "jiti": "^2.5.1",
+    "node-mocks-http": "^1.17.2",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prisma": "^6.13.0",
+    "supertest": "^7.1.4",
     "tailwindcss": "^4.1.11",
+    "ts-jest": "^29.4.1",
     "typescript": "^5",
     "typescript-eslint": "^8.38.0"
   }
