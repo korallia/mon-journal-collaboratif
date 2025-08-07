@@ -8,7 +8,9 @@ import CenteredCard from '@/components/CenteredCard';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
@@ -18,10 +20,15 @@ export default function SignupPage() {
     setError('');
     setSuccess('');
 
+    if (password !== confirmPassword) {
+    setError("Les mots de passe ne correspondent pas.")
+    return
+    }
+
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({username, email, password }),
     });
 
     if (res.ok) {
@@ -40,6 +47,14 @@ export default function SignupPage() {
         {success && <p style={styles.success}>{success}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
+            type="text"
+            placeholder="Nom"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            style={styles.input}
+          />
+          <input
             type="email"
             placeholder="Email"
             value={email}
@@ -54,6 +69,14 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             style={styles.input}
+          />
+          <input
+          type="password"
+          placeholder="Confirmer le mot de passe"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          style={styles.input} // mêmes styles que les autres champs
           />
           <button type="submit" style={styles.submitButton}>
             S’inscrire
