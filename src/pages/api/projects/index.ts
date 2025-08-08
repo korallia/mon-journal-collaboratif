@@ -1,27 +1,32 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { ProjectService } from '@/services/ProjectService';
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { ProjectService } from '@/services/ProjectService'
+import { UserService } from '@/services/UserService'
 
-const service = new ProjectService();
+const projectService = new ProjectService()
+const userService = new UserService()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    switch (req.method) {
-      case 'GET': {
-        const userId = req.query.userId as string;
-        const list = await service.listByUser(userId);
-        return res.status(200).json(list);
-      }
-      case 'POST': {
-        const { name, description, userId } = req.body;
-        const created = await service.create({ name, description, userId });
-        return res.status(201).json(created);
-      }
-      default:
-        res.setHeader('Allow', ['GET', 'POST']);
-        return res.status(405).end(`Method ${req.method} Not Allowed`);
+  switch (req.method) {
+    case 'GET': {
+        const userId = typeof req.query.userId === 'string' ? req.query.userId : ''
+        if (!userId) return res.status(400).json({ message: '`userId` est requis.' })
+        const projects = await projectService.listByUser(userId)
+        return res.status(200).json(projects)
     }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    case 'POST': {
+      const { name,  userId } = req.body ?? {}
+      if (!name || !userId) {
+        return res.status(400).json({ message: 'Le champ `name` et `userId` sont requis.' })
+      }
+
+      const ok = await userService.exists(userId)
+      if (!ok) return res.status(400).json({ message: 'Utilisateur inexistant.' })
+
+      const created = await projectService.create({ name,  userId })
+      return res.status(201).json(created)
+    }
+    default:
+      res.setHeader('Allow', ['GET', 'POST'])
+      return res.status(405).json({ message: `Méthode ${req.method} non autorisée.` })
   }
 }

@@ -3,7 +3,6 @@ import { PrismaClient, Project } from '@prisma/client';
 
 export interface IProjectCreate {
   name: string;
-  description?: string;
   userId: string;
 }
 
@@ -29,16 +28,18 @@ export class ProjectService {
   }
 
   /** Créer un nouveau projet */
-  async create(data: IProjectCreate): Promise<Project> {
-    return this.prisma.project.create({ data });
+   async create(data: IProjectCreate) {
+    const { name, userId } = data
+    return this.prisma.project.create({ data: { name, userId } })
   }
 
   /** Mettre à jour un projet existant */
-  async update(id: string, data: IProjectUpdate): Promise<Project> {
+ async update(id: string, data: IProjectUpdate) {
+    const { name } = data
     return this.prisma.project.update({
       where: { id },
-      data,
-    });
+      data: { ...(name !== undefined ? { name } : {}) },
+    })
   }
 
   /** Supprimer un projet */
