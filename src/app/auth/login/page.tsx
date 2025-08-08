@@ -1,34 +1,36 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthLayout from '../../AuthLayout';
 import CenteredCard from '@/components/CenteredCard';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function SignupPage() {
+ const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    const res = await signIn('credentials', {
-      email,
-      password,
+
+    const res = await signIn("credentials", {
       redirect: false,
+      identifier, // ← très important d’utiliser le bon nom de champ
+      password,
+      callbackUrl: "/dashboard", // ou la route où tu veux aller après
     });
 
-    if (res?.ok) {
-      router.push('/dashboard');
+    if (res?.ok && res.url) {
+      router.push(res.url); // redirection manuelle
     } else {
-      setError('Échec de connexion. Vérifie tes identifiants.');
+      setError("Échec de la connexion.");
     }
   };
+
 
   return (
     <AuthLayout>
@@ -37,10 +39,10 @@ export default function LoginPage() {
         {error && <p style={styles.error}>{error}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
-            type="email"
+            type="text"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             required
             style={styles.input}
           />
@@ -72,6 +74,7 @@ export default function LoginPage() {
     </AuthLayout>
   );
 }
+
 
 const styles = {
   title: {
