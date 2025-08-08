@@ -275,8 +275,8 @@ const s: Record<string, React.CSSProperties> = {
   th: { textAlign: "left", padding: "10px 8px", borderBottom: "1px solid #e5e7eb", color: "#6b7280", fontWeight: 600 },
   td: { padding: "10px 8px", borderBottom: "1px solid #f3f4f6" },
   primaryBtn: {
-    padding: "8px 12px", borderRadius: 8, border: "1px solid #1E293B",
-    backgroundColor: '#1E293B', // Bleu foncé chaleureux
+    padding: "8px 12px", borderRadius: 8, border: "1px solid",
+    background: '#4CAF50', // Bleu foncé chaleureux
     color: '#FFFFFF', cursor: "pointer", marginLeft: 4,
   },
   dangerBtn: {
