@@ -5,7 +5,7 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
-
+import InstallBanner from '@/components/InstallBanner';
 // Ajuste si besoin
 const API = {
   listByUser: (userId: string) => `/api/projects/user/${userId}`,
@@ -70,6 +70,7 @@ export default function DashboardPage() {
 
   if (!userId) {
     return (
+      
       <div style={s.center}>
         <h1 style={s.h1}>{title}</h1>
         <p style={s.error}>
@@ -239,8 +240,11 @@ export default function DashboardPage() {
 
 
           </table>
+          
         )}
+          <InstallBanner />
       </section>
+    
     </div>
   );
 }
