@@ -29,8 +29,14 @@ export class TaskService {
   }
 
   async update(id: string, data: ITaskUpdate): Promise<Task> {
-    return this.prisma.task.update({ where: { id }, data });
-  }
+        return this.prisma.task.update({
+      where: { id },
+      data: {
+        ...(data.title !== undefined ? { title: data.title } : {}),
+        ...(data.done  !== undefined ? { done:  data.done  } : {}),
+      }
+        });
+}
 
   async delete(id: string): Promise<void> {
     await this.prisma.task.delete({ where: { id } });
