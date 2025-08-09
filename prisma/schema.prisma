@@ -33,12 +33,16 @@ model Project {
 }
 
 model Task {
-  id        String    @id @default(cuid())
-  title     String
-  project   Project   @relation(fields: [projectId], references: [id])
-  projectId String
-  entries   EntryTaskLog[]
-  createdAt DateTime  @default(now())
+  id         String   @id @default(cuid())
+  projectId  String
+  title      String
+  done       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
 }
 
 model EntryTaskLog {
