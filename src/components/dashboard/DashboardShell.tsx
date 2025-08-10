@@ -1,7 +1,8 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn,  } from "next-auth/react";
 import s from "./styles";
+import { useRouter } from 'next/navigation';
 
 type Props = {
   projectCount?: number;
@@ -10,12 +11,8 @@ type Props = {
 
 export default function DashboardShell({ projectCount, children }: Props) {
   const { data: session, status } = useSession();
+  const router = useRouter(); // Initialisez le hook de routage
 
-  if (status === "loading") return <p style={s.muted}>Chargement de la session…</p>;
-  if (status === "unauthenticated") {
-    signIn();
-    return null;
-  }
 
   const name = session?.user?.name ?? session?.user?.email ?? "Utilisateur";
   const email = session?.user?.email;
@@ -34,7 +31,7 @@ export default function DashboardShell({ projectCount, children }: Props) {
               </div>
             </div>
           </div>
-          <button onClick={() => signOut()} style={s.outBtnOnDark}>Se déconnecter</button>
+          <button onClick={() => router.push('/auth/signout')} style={s.outBtnOnDark}>Se déconnecter</button>
         </div>
       </div>
 
