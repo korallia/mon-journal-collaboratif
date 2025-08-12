@@ -8,20 +8,22 @@ export const classes = {
 
 // styles.ts
 export const globalPlaceholderCss = `
-  /* Sélecteurs costauds + !important pour battre tout reset */
-  input.${classes.textInput}[placeholder]::placeholder,
-  input.${classes.textInput}[placeholder]::-webkit-input-placeholder,
-  input.${classes.textInput}[placeholder]::-moz-placeholder,
-  input.${classes.textInput}[placeholder]:-ms-input-placeholder,
-  input.${classes.textInput}[placeholder]::-ms-input-placeholder {
-    color: #6b7280 !important;     /* même gris que l'entête "Nom" */
-    font-weight: 600 !important;    /* même graisse */
-    letter-spacing: 0.01em !important;
-    opacity: 1 !important;          /* Safari */
+  /* placeholder comme l'en-tête "Nom" */
+  .${classes.textInput}::placeholder,
+  .${classes.textInput}::-webkit-input-placeholder,
+  .${classes.textInput}::-moz-placeholder,
+  .${classes.textInput}:-ms-input-placeholder,
+  .${classes.textInput}::-ms-input-placeholder {
+    color: #6b7280 !important;   /* même gris que s.th.color */
+    font-weight: 600;             /* même poids que l'en-tête */
+    letter-spacing: 0.01em;       /* léger tracking, optionnel */
+    opacity: 1;                   /* Safari corrige l’opacité */
   }
-  input.${classes.textInput}[placeholder]:focus::placeholder {
-    color: #94a3b8 !important;      /* un poil plus clair au focus (optionnel) */
-    font-weight: 600 !important;
+
+  /* Au focus: un poil plus clair (optionnel) */
+  .${classes.textInput}:focus::placeholder {
+    color: #94a3b8 !important;    /* slate-400 */
+    font-weight: 600;
   }
 `;
 
@@ -35,7 +37,7 @@ export const s: Record<string, React.CSSProperties> = {
 
   // Hero/banner
   hero: {
-    backgroundColor: "#1E293B",
+    backgroundColor: "#232e41ff",
     color: "#FFFFFF",
     borderRadius: 16,
     padding: "20px 24px",
@@ -61,7 +63,7 @@ export const s: Record<string, React.CSSProperties> = {
   heroSub: { opacity: 0.85, fontSize: 14, marginTop: 2 },
 
   // Alerts / text
-  muted: { fontSize: "12px", color: "#8B949E" },
+  muted: { fontSize: "12px", color: "#A8B6C9" },
   alert: {
     background: "#E5EAF1",
     color: "#92400E",
@@ -110,7 +112,7 @@ export const s: Record<string, React.CSSProperties> = {
   },
 
   // Ligne de projet sombre avec coins arrondis
-  projectRow: { background: "#1E293B", color: "#dbe4f0ff", borderRadius: 16 },
+  projectRow: { background: "#232e41ff", color: "#dbe4f0ff", borderRadius: 16 },
   projectCell: { padding: "10px 8px", verticalAlign: "middle" },
   projectCellFirst: { borderTopLeftRadius: 16, borderBottomLeftRadius: 16 },
   projectCellLast: { borderTopRightRadius: 16, borderBottomRightRadius: 16 },
@@ -180,17 +182,19 @@ export const s: Record<string, React.CSSProperties> = {
   },
 
   // Accordéon des tâches
-  accordionCell: { background: "#1D2125", borderRadius: 12, padding: 14, color: "#dbe4f0ff", marginTop: "8px" },
+  accordionCell: { background: "#3b4861ff", borderRadius: 12, padding: 14, color: "#dbe4f0ff", marginTop: "8px" },
   taskAddRow: { display: "flex", gap: 8, marginBottom: 10 },
   taskList: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 },
   taskItem: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    background: "#2B323B",
-    border: "1px solid #1f2937",
+    background: "#2B3E59",
+    boxShadow: "inset 0 0 0 3px rgba(0, 0, 0, 0.15)",
+    color: "#F4F8FF",
     borderRadius: 10,
     padding: "8px 10px",
+    fontWeight: 600,
   },
   taskLabel: { display: "flex", alignItems: "center", gap: 8 },
 

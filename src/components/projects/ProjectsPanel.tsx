@@ -358,7 +358,7 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                               colSpan={isNarrow ? 4 : 5}
                               style={{
                                 padding: "0 8px 10px 8px",
-                                background: "#1C2025",
+                                background: "#3b4861ff",
                                 borderBottomLeftRadius: 16,
                                 borderBottomRightRadius: 16,
                               }}

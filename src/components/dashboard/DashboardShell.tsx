@@ -31,7 +31,7 @@ export default function DashboardShell({ projectCount, children }: Props) {
               </div>
             </div>
           </div>
-          <button onClick={() => router.push('/auth/signout')} style={s.outBtnOnDark}>Se déconnecter</button>
+          <button onClick={() => router.push('/auth/signout')} style={s.ghostBtnOnDark}>Se déconnecter</button>
         </div>
       </div>
 
