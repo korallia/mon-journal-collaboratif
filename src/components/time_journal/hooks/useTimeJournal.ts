@@ -5,7 +5,40 @@ import API from '../api';
 import { EntryDTO, ProjectDTO, TaskDTO } from '../types';
 import { todayISO, toHours } from '../utils';
 
-export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unauthenticated'; userId?: string }) {
+// (facultatif mais propre) type de retour explicite
+export interface UseTimeJournal {
+  // selections
+  projects: ProjectDTO[];
+  projectId: string;
+  setProjectId: React.Dispatch<React.SetStateAction<string>>;
+  tasks: TaskDTO[];
+  taskId: string;
+  setTaskId: React.Dispatch<React.SetStateAction<string>>;
+  // form
+  entryDate: string; setEntryDate: (v: string) => void;
+  hours: number; setHours: (v: number) => void;
+  minutes: number; setMinutes: (v: number) => void;
+  notes: string; setNotes: (v: string) => void;
+  entryTitle: string; setEntryTitle: (v: string) => void;   // ← NEW
+  // entries
+  entries: EntryDTO[];
+  reloadEntries: (pid?: string) => void;
+  handleCreateEntry: (e: React.FormEvent) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  onEdit: (e: EntryDTO) => void;
+  resetForm: () => void;
+  // state
+  loadingProjects: boolean;
+  noProjects: boolean;
+  errorMsg: string;
+  currentProject?: ProjectDTO;
+  hasProjects: boolean;
+  disabled: boolean;
+}
+
+export function useTimeJournal(
+  params: { status: 'loading'|'authenticated'|'unauthenticated'; userId?: string }
+): UseTimeJournal {
   const { status, userId } = params;
 
   // selections
@@ -19,6 +52,7 @@ export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unau
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [notes, setNotes] = useState<string>('');
+  const [entryTitle, setEntryTitle] = useState<string>('');         // ← NEW
 
   // entries
   const [entries, setEntries] = useState<EntryDTO[]>([]);
@@ -83,7 +117,10 @@ export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unau
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
-  const currentProject = useMemo(() => projects.find((p) => p.id === projectId), [projects, projectId]);
+  const currentProject = useMemo(
+    () => projects.find((p) => p.id === projectId),
+    [projects, projectId]
+  );
   const hasProjects = projects.length > 0;
   const disabled = !hasProjects || loadingProjects || status !== 'authenticated';
 
@@ -91,7 +128,10 @@ export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unau
     (async () => {
       const r = await fetch(API.entries.list(20, pid || undefined), { cache: 'no-store' });
       const data: EntryDTO[] = (await r.json()) || [];
-      const enriched = data.map((e) => ({ ...e, taskName: e.taskName || taskNameById.get(e.taskId) || 'Tâche' }));
+      const enriched = data.map((e) => ({
+        ...e,
+        taskName: e.taskName || taskNameById.get(e.taskId) || 'Tâche',
+      }));
       setEntries(enriched);
     })();
   }
@@ -102,20 +142,34 @@ export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unau
     setHours(0);
     setMinutes(0);
     setNotes('');
+    setEntryTitle('');                              // ← NEW
   }
 
   async function handleCreateEntry(e: React.FormEvent) {
     e.preventDefault();
     if (!projectId || !taskId) return;
+
     const totalHours = toHours(hours, minutes);
     if (totalHours <= 0) return;
 
-    const payload = { taskId, entryDate, hoursLogged: totalHours, notes: notes?.trim() || undefined };
-    const r = await fetch(API.entries.create, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+    const payload = {
+      taskId,
+      entryDate,
+      hoursLogged: totalHours,
+      notes: notes?.trim() || undefined,
+      title: entryTitle?.trim() || undefined,       // ← NEW
+    };
+
+    const r = await fetch(API.entries.create, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
     if (!r.ok) return;
 
     const created: EntryDTO = await r.json();
     created.taskName = taskNameById.get(created.taskId) || 'Tâche';
+    if (!created.title) created.title = entryTitle || ''; // fallback local
     setEntries((prev) => [created, ...prev]);
     resetForm();
   }
@@ -137,6 +191,7 @@ export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unau
     setHours(h);
     setMinutes(m);
     setNotes(entry.notes || '');
+    setEntryTitle(entry.title || '');               // ← NEW
   }
 
   return {
@@ -145,6 +200,7 @@ export function useTimeJournal(params: { status: 'loading'|'authenticated'|'unau
     tasks, taskId, setTaskId,
     // form
     entryDate, setEntryDate, hours, setHours, minutes, setMinutes, notes, setNotes,
+    entryTitle, setEntryTitle,                          // ← NEW
     // entries
     entries, reloadEntries, handleCreateEntry, onDelete, onEdit, resetForm,
     // state

@@ -32,11 +32,11 @@ const st: Record<string, React.CSSProperties> = {
 
   stack: { display: 'grid', gap: 16 },
   card: {
-    background: '#232e41ff', color: '#dbe4f0ff', borderRadius: 16, padding: 16,
+    background: '#1E293B', color: '#dbe4f0ff', borderRadius: 16, padding: 16,
     boxShadow: '0 8px 20px rgba(2, 6, 23, 0.15)',
   },
   sectionHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  cardTitle: { margin: 0, fontSize: '1.05rem', fontWeight: 700 },
+  cardTitle: { margin: 0, fontSize: '1.05rem', fontWeight: 700, paddingBottom: 10 },
 
   formRow: { display: 'grid', gridTemplateColumns: '1fr 140px 90px 90px', gap: 8, marginBottom: 8 },
   input: {
@@ -83,7 +83,30 @@ const st: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: 8,
-    paddingTop:10,
+    paddingTop: 10
   },
+  inputLabel: {
+  fontSize: 12,
+  fontWeight: 700,
+  color: '#b6c4d8',         // lisible sur le fond foncé
+  marginBottom: 6,
+},
+field: { display: 'flex', flexDirection: 'column' , paddingBottom:10},
+unitWrap: { position: 'relative' },
+unitBadge: {
+  position: 'absolute',
+  right: 10,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  fontSize: 12,
+  color: '#475569',         // sur input blanc
+  opacity: 0.9,
+  pointerEvents: 'none',
+},
+helpText: {
+  fontSize: 12,
+  color: '#9fb0c6',
+  marginTop: 4,
+},
 };
 export default st;

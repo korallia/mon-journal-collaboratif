@@ -26,11 +26,12 @@ export default function TimePage() {
     projects, projectId, setProjectId,
     tasks, taskId, setTaskId,
     // form
-    entryDate, setEntryDate, hours, setHours, minutes, setMinutes, notes, setNotes,
+    entryDate, setEntryDate, hours, setHours, minutes, setMinutes, notes, setNotes, entryTitle, setEntryTitle,
     // entries
     entries, reloadEntries, handleCreateEntry, onDelete, onEdit, resetForm,
     // state
     loadingProjects, noProjects, errorMsg, currentProject, hasProjects, disabled,
+
   } = j;
 
   // Auth: redirige si non connecté
@@ -100,6 +101,8 @@ export default function TimePage() {
           onSubmit={handleCreateEntry}
           onReset={resetForm}
           s={s}
+          entryTitle={entryTitle}   
+        setEntryTitle={setEntryTitle}
         />
 
         <EntryList

@@ -8,4 +8,5 @@ export type EntryDTO = {
   notes?: string | null;
   taskName?: string;
   projectId?: string;
+   title?: string;            
 };
