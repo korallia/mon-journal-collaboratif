@@ -1,11 +1,43 @@
+// src/dashboard/styles.ts
 import type React from "react";
 
+/** Classe utilitaire à appliquer sur l’input pour cibler le placeholder */
+export const classes = {
+  textInput: "dash-text-input",
+};
+
+// styles.ts
+export const globalPlaceholderCss = `
+  /* placeholder comme l'en-tête "Nom" */
+  .${classes.textInput}::placeholder,
+  .${classes.textInput}::-webkit-input-placeholder,
+  .${classes.textInput}::-moz-placeholder,
+  .${classes.textInput}:-ms-input-placeholder,
+  .${classes.textInput}::-ms-input-placeholder {
+    color: #6b7280 !important;   /* même gris que s.th.color */
+    font-weight: 600;             /* même poids que l'en-tête */
+    letter-spacing: 0.01em;       /* léger tracking, optionnel */
+    opacity: 1;                   /* Safari corrige l’opacité */
+  }
+
+  /* Au focus: un poil plus clair (optionnel) */
+  .${classes.textInput}:focus::placeholder {
+    color: #94a3b8 !important;    /* slate-400 */
+    font-weight: 600;
+  }
+`;
+
+
 export const s: Record<string, React.CSSProperties> = {
-  container: { maxWidth: 900, margin: "40px auto", padding: "0 16px" },
+  container: {
+    maxWidth: 900,
+    margin: "40px auto",
+    padding: "0 16px",
+  },
 
   // Hero/banner
   hero: {
-    backgroundColor: "#1E293B",
+    backgroundColor: "#232e41ff",
     color: "#FFFFFF",
     borderRadius: 16,
     padding: "20px 24px",
@@ -15,67 +47,165 @@ export const s: Record<string, React.CSSProperties> = {
   heroRow: { display: "flex", alignItems: "center", justifyContent: "space-between" },
   heroLeft: { display: "flex", alignItems: "center", gap: 12 },
   avatar: {
-    width: 44, height: 44, borderRadius: "50%",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    background: "#334155", color: "#fff", fontWeight: 700, fontSize: 18,
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#334155",
+    color: "#fff",
+    fontWeight: 700,
+    fontSize: 18,
     boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.15)",
   },
   heroTitle: { fontSize: "1.5rem", fontWeight: 700, margin: 0 },
   heroSub: { opacity: 0.85, fontSize: 14, marginTop: 2 },
 
   // Alerts / text
-  muted: { color: "#6b7280" },
+  muted: { fontSize: "12px", color: "#A8B6C9" },
   alert: {
-    background: "#FEF3C7", color: "#92400E", border: "1px solid #FDE68A",
-    padding: 12, borderRadius: 8, marginBottom: 16,
+    background: "#E5EAF1",
+    color: "#92400E",
+    border: "1px solid #FDE68A",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
   },
 
   // Cards
-  card: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 16, marginBottom: 16 },
+  card: {
+    background: "#E5EAF1",
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
 
   // Controls
-  row: { display: "flex", gap: 8, alignItems: "center" },
-  input: { flex: 1, padding: "8px 10px", borderRadius: 8, border: "1px solid #d1d5db", outline: "none" },
-
-  // Table
-  table: { width: "100%", borderCollapse: "separate", borderSpacing: "0 8px" },
-  th: { textAlign: "left", padding: "10px 8px", borderBottom: "1px solid #e5e7eb", color: "#6b7280", fontWeight: 600 },
-
-  // Dark row with rounded corners
-  tdOnDark: {
-    background: "#1E293B", color: "#FFFFFF", padding: "10px 8px", border: "none",
-  },
-  tdOnDarkFirst: {
-    background: "#1E293B", color: "#FFFFFF", padding: "10px 8px", border: "none",
-    borderTopLeftRadius: 16, borderBottomLeftRadius: 16,
-  },
-  tdOnDarkLast: {
-    background: "#1E293B", color: "#FFFFFF", padding: "10px 8px", border: "none",
-    borderTopRightRadius: 16, borderBottomRightRadius: 16,
+  row: { display: "flex", gap: 8, alignItems: "center", color: "#111827" },
+  input: {
+    flex: 1,
+    padding: "8px 10px",
+    borderRadius: 8,
+    border: "1px solid #d1d5db",
+    outline: "none",
+    background: "#fff",
+    color: "#0f172a",
   },
 
-  // Buttons
-  primaryBtn: { padding: "8px 12px", borderRadius: 8, border: "1px solid", background: "#4CAF50", color: "#FFFFFF", cursor: "pointer", marginLeft: 4 },
-  dangerBtn:  { padding: "8px 12px", borderRadius: 8, border: "1px solid #ef4444", background: "#ef4444", color: "#fff", cursor: "pointer", marginLeft: 4 },
-  ghostBtn:   { padding: "8px 12px", borderRadius: 8, border: "1px solid #d1d5db", background: "#fff", color: "#111827", cursor: "pointer", marginLeft: 4 },
+  // Tableau
+  tableScroll: { width: "100%", overflowX: "hidden" },
+  table: {
+    width: "100%",
+    borderCollapse: "separate",
+    borderSpacing: "0 8px",
+    tableLayout: "auto",
+  },
+  th: {
+    textAlign: "left",
+    padding: "10px 8px",
+    borderBottom: "1px solid #e5e7eb",
+    color: "#6b7280",
+    fontWeight: 600,
+    whiteSpace: "nowrap",
+  },
+
+  // Ligne de projet sombre avec coins arrondis
+  projectRow: { background: "#232e41ff", color: "#dbe4f0ff", borderRadius: 16 },
+  projectCell: { padding: "10px 8px", verticalAlign: "middle" },
+  projectCellFirst: { borderTopLeftRadius: 16, borderBottomLeftRadius: 16 },
+  projectCellLast: { borderTopRightRadius: 16, borderBottomRightRadius: 16 },
+
+  // Conteneur des boutons d'action (desktop/table)
+  projectActions: {
+    display: "flex",
+    gap: "8px",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+  },
+
+  // Boutons
+  primaryBtn: {
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "rgba(255,255,255,.35)",
+    background: "#4CAF50",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
+    marginLeft: 4,
+  },
+  dangerBtn: {
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "#C62828",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
+    marginLeft: 4,
+  },
   ghostBtnOnDark: {
-    padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,.35)",
-    background: "transparent", backgroundColor: "#4B5563", color: "#FFFFFF", cursor: "pointer", marginLeft: 4,
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "transparent",
+    backgroundColor: "#546E7A",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
+    marginLeft: 4,
   },
   secondaryBtnOnDark: {
-    padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,.2)",
-    background: "#334155", color: "#FFFFFF", cursor: "pointer", marginLeft: 4,
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "#4169E1",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
+    marginLeft: 4,
   },
   outBtnOnDark: {
-    padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,.35)",
-    background: "transparent", color: "#fff", cursor: "pointer",
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "transparent",
+    color: "#dbe4f0ff ",
+    cursor: "pointer",
+  },
+  ghostBtn: {
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid #d1d5db",
+    background: "#fff",
+    color: "#111827",
+    cursor: "pointer",
+    marginLeft: 4,
   },
 
-  // Accordion
-  accordionCell: { background: "#0b1220", borderRadius: 12, padding: 14, color: "#e5e7eb" },
+  // Accordéon des tâches
+  accordionCell: { background: "#3b4861ff", borderRadius: 12, padding: 14, color: "#dbe4f0ff", marginTop: "8px" },
   taskAddRow: { display: "flex", gap: 8, marginBottom: 10 },
   taskList: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 },
-  taskItem: { display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111827", border: "1px solid #1f2937", borderRadius: 10, padding: "8px 10px" },
+  taskItem: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    background: "#2B3E59",
+    boxShadow: "inset 0 0 0 3px rgba(0, 0, 0, 0.15)",
+    color: "#F4F8FF",
+    borderRadius: 10,
+    padding: "8px 10px",
+    fontWeight: 600,
+  },
   taskLabel: { display: "flex", alignItems: "center", gap: 8 },
+
+  // ----- Mobile cards -----
+  listReset: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 },
+  projectCard: { background: "#1E293B", color: "#dbe4f0ff", borderRadius: 16, padding: 12 },
+  projectName: { fontWeight: 700, fontSize: "1rem", margin: "0 0 6px 0" },
+  metaGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 4 },
+  metaLabel: { fontSize: 12, color: "rgba(255,255,255,.7)" },
+  metaValue: { whiteSpace: "nowrap" },
+  actionsRow: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 },
 };
+
 export default s;
