@@ -3,6 +3,7 @@
 import { useSession, signIn,  } from "next-auth/react";
 import s from "./styles";
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 type Props = {
   projectCount?: number;
@@ -31,7 +32,10 @@ export default function DashboardShell({ projectCount, children }: Props) {
               </div>
             </div>
           </div>
-          <button onClick={() => router.push('/auth/signout')} style={s.ghostBtnOnDark}>Se déconnecter</button>
+           <div  style={s.topRight}>
+    <a href="/time/new" style={s.primaryBtn}>Journal de temps</a>
+    <button style={s.ghostBtnOnDark}>Se déconnecter</button>
+  </div>
         </div>
       </div>
 

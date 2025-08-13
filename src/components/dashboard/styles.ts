@@ -62,6 +62,14 @@ export const s: Record<string, React.CSSProperties> = {
   heroTitle: { fontSize: "1.5rem", fontWeight: 700, margin: 0 },
   heroSub: { opacity: 0.85, fontSize: 14, marginTop: 2 },
 
+   topRight: {
+    marginLeft: 'auto',            // pousse à droite
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    flexShrink: 0,
+  },
+
   // Alerts / text
   muted: { fontSize: "12px", color: "#A8B6C9" },
   alert: {
@@ -129,14 +137,17 @@ export const s: Record<string, React.CSSProperties> = {
   primaryBtn: {
     padding: "8px 12px",
     borderRadius: 8,
-    border: "rgba(255,255,255,.35)",
+    height: 40,
+    display: 'inline-flex',     
+    alignItems: 'center',    
+     border: "1px solid rgba(255,255,255,.35)",
     background: "#4CAF50",
     color: "#dbe4f0ff",
     cursor: "pointer",
     marginLeft: 4,
   },
   dangerBtn: {
-    padding: "8px 12px",
+    padding: "8px 20px",
     borderRadius: 8,
     border: "1px solid rgba(255,255,255,.35)",
     background: "#C62828",
@@ -146,6 +157,9 @@ export const s: Record<string, React.CSSProperties> = {
   },
   ghostBtnOnDark: {
     padding: "8px 12px",
+    height: 40,
+      display: 'inline-flex',     
+      alignItems: 'center',    
     borderRadius: 8,
     border: "1px solid rgba(255,255,255,.35)",
     background: "transparent",
