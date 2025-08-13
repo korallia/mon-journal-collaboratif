@@ -36,9 +36,9 @@ export default function TimeHeader({ status, loadingProjects, hasProjects, curre
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <ProgressBar value={progressValue} label="Progression du projet" />
-          <a href={backHref} style={s.ghostBtnOnDark}>Retour au tableau</a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 40 }}>
+            <ProgressBar value={progressValue} label="Progression du projet : " />
+            <a href={backHref} style={s.ghostBtnOnDark}>Retour au tableau</a>
         </div>
       </div>
     </div>
