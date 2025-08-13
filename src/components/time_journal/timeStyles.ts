@@ -62,5 +62,28 @@ const st: Record<string, React.CSSProperties> = {
     background: '#4169E1', color: '#dbe4f0ff', borderRadius: 9999, padding: '2px 8px', fontSize: 12,
     marginRight: 8, display: 'inline-block',
   },
+
+  panelLight: {
+    background: '#e9eff6',                 // même vibe bleu très pâle
+    borderRadius: 12,
+    padding: 16,
+    border: '1px solid rgba(15,23,42,0.06)',
+    boxShadow: '0 2px 8px rgba(2,6,23,0.06)',
+    marginBottom: 16,                       // même écart vertical sous la bande
+  },
+  panelTitle: {
+    margin: '0 0 12px 0',
+    fontSize: 18,
+    fontWeight: 700,
+    color: '#0f172a',
+  },
+
+  // Empilement vertical label + champ
+  pickerStack: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    paddingTop:10,
+  },
 };
 export default st;

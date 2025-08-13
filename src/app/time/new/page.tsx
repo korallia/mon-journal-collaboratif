@@ -64,12 +64,15 @@ export default function TimePage() {
         progressValue={progressValue}
       />
 
-      <ProjectPicker
-        projects={projects}
-        projectId={projectId}
-        setProjectId={setProjectId}
-        disabled={disabled}
-      />
+      <div style={timeSt.panelLight}>
+  <ProjectPicker
+    projects={projects}
+    projectId={projectId}
+    setProjectId={setProjectId}
+    disabled={disabled}
+  />
+</div>
+
 
       {/* CTA si aucun projet */}
       {status === 'authenticated' && !loadingProjects && !hasProjects && (
