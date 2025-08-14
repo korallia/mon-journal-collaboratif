@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient } from '@prisma/client';
 import type { Entry } from '@prisma/client';
 
@@ -60,21 +61,29 @@ export class EntryService {
   }
 
   /** Mettre à jour une entrée */
-  async update(id: string, data: IEntryUpdate): Promise<EntryWithTask> {
-    return this.prisma.entry.update({
-      where: { id },
-      data: {
-        ...(data.entryDate !== undefined ? { entryDate: new Date(data.entryDate) } : {}),
-        ...(data.hoursLogged !== undefined ? { hoursLogged: data.hoursLogged } : {}),
-        ...(data.title !== undefined ? { title: data.title ?? null } : {}),
-        ...(data.notes !== undefined ? { notes: data.notes ?? null } : {}),
-      },
-      include: { task: { select: { id: true, title: true, projectId: true } } },
-    }) as Promise<EntryWithTask>;
+  async update(
+    id: string,
+    data: { entryDate?: string; hoursLogged?: number; title?: string | null; notes?: string | null }
+  ): Promise<EntryWithTask | null> {
+    try {
+      return (await this.prisma.entry.update({
+        where: { id },
+        data: {
+          ...(data.entryDate !== undefined ? { entryDate: new Date(data.entryDate) } : {}),
+          ...(data.hoursLogged !== undefined ? { hoursLogged: data.hoursLogged } : {}),
+          ...(data.title !== undefined ? { title: data.title } : {}),
+          ...(data.notes !== undefined ? { notes: data.notes } : {}),
+        },
+        include: { task: { select: { id: true, title: true, projectId: true } } },
+      })) as EntryWithTask;
+    } catch (e: any) {
+      if (e?.code === 'P2025') return null; // not found
+      throw e;
+    }
   }
 
   /** Supprimer une entrée */
   async delete(id: string): Promise<void> {
-    await this.prisma.entry.delete({ where: { id } });
+    await this.prisma.entry.deleteMany({ where: { id } });
   }
 }

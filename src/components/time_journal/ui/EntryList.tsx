@@ -1,5 +1,5 @@
-'use client';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
 import React from 'react';
 import st from '../timeStyles';
 import { EntryDTO } from '../types';
@@ -11,7 +11,8 @@ type Props = {
   onDelete: (id: string) => void;
   onRefresh: () => void;
   hasProjects: boolean;
-  s: any; // style-kit global (boutons, muted, danger, etc.)
+  projectLabel?: string; // ← NEW
+  s: any;
 };
 
 export default function EntryList({
@@ -20,18 +21,14 @@ export default function EntryList({
   onDelete,
   onRefresh,
   hasProjects,
+  projectLabel,
   s,
 }: Props) {
   return (
     <section style={st.card}>
       <div style={st.sectionHead}>
         <h3 style={st.cardTitle}>Dernières entrées</h3>
-        <button
-          type="button"
-          style={s.ghostBtnOnDark}
-          onClick={onRefresh}
-          disabled={!hasProjects}
-        >
+        <button type="button" style={s.ghostBtnOnDark} onClick={onRefresh} disabled={!hasProjects}>
           Rafraîchir
         </button>
       </div>
@@ -39,46 +36,49 @@ export default function EntryList({
       <ul style={st.entryList}>
         {entries.map((e) => (
           <li key={e.id} style={st.entryItem}>
-            <div>
-              {/* Ligne titre */}
-              <div style={st.entryTitle}>
-                <span style={st.badge}>{e.taskName || 'Tâche'}</span>
-                <span style={{ fontWeight: 700 }}>
-                  {e.title ? e.title : e.notes ? e.notes : '—'}
-                </span>
-              </div>
+  <div style={{ display: 'grid', gap: 4 }}>
+    <div style={st.badgeRow}>
+      {/* Projet (si fourni depuis la page) */}
+      {projectLabel && (
+        <span style={{ ...st.badgeBase, ...st.badgeProject }}>
+          {projectLabel}
+        </span>
+      )}
 
-              {/* Afficher la note quand il y a aussi un titre */}
-              {e.title && e.notes && (
-                <div style={{ marginTop: 2 }}>{e.notes}</div>
-              )}
+      {/* Tâche */}
+      <span style={{ ...st.badgeBase, ...st.badgeTask }}>
+        {e.taskName ?? 'Tâche'}
+      </span>
 
-              {/* Métadonnées */}
-              <div style={st.entryMeta}>
-                {formatDate(e.entryDate)} • {formatHours(e.hoursLogged)}
-              </div>
-            </div>
+      {/* Durée */}
+      <span style={{ ...st.badgeBase, ...st.badgeHours }}>
+        {formatHours(e.hoursLogged)}
+      </span>
 
-            <div style={st.itemActions}>
-              <button type="button" style={s.ghostBtnOnDark} onClick={() => onEdit(e)}>
-                Modifier
-              </button>
-              <button
-                type="button"
-                style={s.dangerBtn}
-                onClick={() => onDelete(e.id)}
-                aria-label="Supprimer l’entrée"
-              >
-                Supprimer
-              </button>
-            </div>
-          </li>
+      {/* Date */}
+      <span style={{ ...st.badgeBase, ...st.badgeDate }}>
+        {formatDate(e.entryDate)}
+      </span>
+    </div>
+
+    {/* Titre + notes */}
+    <div style={st.entryTitle}>
+      {e.title || e.notes || '—'}
+    </div>
+  </div>
+
+  <div style={st.itemActions}>
+    <button style={s.ghostBtnOnDark} onClick={() => onEdit(e)}>
+      Modifier
+    </button>
+    <button style={s.dangerBtn} onClick={() => onDelete(e.id)}>
+      Supprimer
+    </button>
+  </div>
+</li>
         ))}
-
         {entries.length === 0 && (
-          <li style={s.muted}>
-            {hasProjects ? 'Aucune entrée pour l’instant.' : '—'}
-          </li>
+          <li style={s.muted}>{hasProjects ? 'Aucune entrée pour l’instant.' : '—'}</li>
         )}
       </ul>
     </section>

@@ -54,7 +54,7 @@ const st: Record<string, React.CSSProperties> = {
     background: '#2B3E59', color: '#F4F8FF', borderRadius: 10, padding: '10px 12px',
     boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.15)',
   },
-  entryTitle: { fontWeight: 600, marginBottom: 2 },
+  entryTitle: { fontWeight: 600, marginBottom: 2 , marginTop: 6,},
   entryMeta: { fontSize: 12, opacity: 0.8 },
   itemActions: { display: 'flex', gap: 8 },
 
@@ -107,6 +107,47 @@ helpText: {
   fontSize: 12,
   color: '#9fb0c6',
   marginTop: 4,
+  marginBottom: 4,
+},
+badgeRow: {
+  display: 'flex',
+  gap: 6,
+  flexWrap: 'wrap',
+  alignItems: 'center',
+},
+
+badgeBase: {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  height: 22,
+  padding: '0 10px',
+  fontSize: 12,
+  fontWeight: 600,
+  borderRadius: 9999,
+  boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.12)',
+  transition: 'transform .12s ease, filter .12s ease',
+},
+
+badgeProject: {
+  background: '#4169E1',         // bleu royal
+  color: '#E9F1FF',
+   cursor: 'default',
+},
+
+badgeTask: {
+   background: 'rgba(148, 163, 184, 0.64)', // slate-400 à 18%
+  color: '#E5ECF5',
+},
+
+badgeHours: {
+background: 'rgba(22, 163, 74, 0.64)',   // green-600 à 20%
+  color: '#CFF6D4',
+},
+
+badgeDate: {
+background: 'rgba(99, 101, 241, 0.64)',  // indigo-500 à 20%
+  color: '#E7E9FF',
 },
 };
 export default st;

@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { NextApiRequest, NextApiResponse } from 'next';
-// Ajuste l'import selon ton alias TS. Si tu n'as pas `baseUrl: "src"`, fais un import relatif:
 import { EntryService, type EntryWithTask } from '@/services/entryService';
 
 const service = new EntryService();
 
+// 👇 ton DTO inchangé
 function toEntryDTO(e: EntryWithTask) {
   return {
     id: e.id,
@@ -22,9 +21,19 @@ function toEntryDTO(e: EntryWithTask) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
+      const projectId =
+        typeof req.query.projectId === 'string' ? req.query.projectId : undefined;
+
+      if (!projectId) {
+        // Au choix: renvoyer [] (permissif) ou une 400 (strict). Ici: permissif.
+        return res.status(200).json([]);
+      }
+
       const limit = Number(req.query.limit ?? 20);
-      const projectId = typeof req.query.projectId === 'string' ? req.query.projectId : undefined;
-      const rows = await service.list({ limit: Number.isFinite(limit) ? limit : 20, projectId });
+      const rows = await service.list({
+        limit: Number.isFinite(limit) ? limit : 20,
+        projectId,
+      });
       return res.status(200).json(rows.map(toEntryDTO));
     }
 

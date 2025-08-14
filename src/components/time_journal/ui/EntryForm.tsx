@@ -7,14 +7,21 @@ import { TaskDTO } from '../types';
 interface Props {
   tasks: TaskDTO[];
   taskId: string; setTaskId: (v: string) => void;
+
   entryDate: string; setEntryDate: (v: string) => void;
   hours: number; setHours: (v: number) => void;
   minutes: number; setMinutes: (v: number) => void;
+
   notes: string; setNotes: (v: string) => void;
   entryTitle: string; setEntryTitle: (v: string) => void;
+
   disabled: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onReset: () => void;
+
+  isEditing?: boolean;
+  onCancelEdit?: () => void;
+
   s: any;
 }
 
@@ -25,15 +32,19 @@ export default function EntryForm({
   minutes, setMinutes,
   notes, setNotes,
   entryTitle, setEntryTitle,
-  disabled, onSubmit, onReset, s,
+  disabled, onSubmit, onReset,
+  isEditing = false, onCancelEdit,
+  s,
 }: Props) {
   const hasTasks = tasks.length > 0;
+  const canSubmit = !disabled && !!taskId && (hours > 0 || minutes > 0);
 
   return (
     <section style={{ ...st.card, ...(disabled ? { opacity: 0.7 } : null) }}>
-      <h3 style={st.cardTitle}>Ajouter une entrée</h3>
+      <h3 style={st.cardTitle}>{isEditing ? 'Modifier une entrée' : 'Ajouter une entrée'}</h3>
 
-      <form onSubmit={onSubmit}>
+      {/* noValidate : évite que la validation native bloque le submit */}
+      <form onSubmit={onSubmit} noValidate>
         {/* Ligne 1 : Tâche / Date / Heures / Minutes */}
         <div style={st.formRow}>
           {/* Tâche */}
@@ -80,6 +91,7 @@ export default function EntryForm({
                 disabled={disabled}
                 style={{ ...st.input, width: '100%', paddingRight: 28 }}
                 aria-describedby="ef-duration-help"
+                inputMode="numeric"
               />
               <span style={st.unitBadge}>h</span>
             </div>
@@ -94,13 +106,14 @@ export default function EntryForm({
                 type="number"
                 min={0}
                 max={59}
-                step={5}
+                step={1}
                 placeholder="0"
                 value={minutes}
                 onChange={(e) => setMinutes(Number(e.target.value))}
                 disabled={disabled}
                 style={{ ...st.input, width: '100%', paddingRight: 34 }}
                 aria-describedby="ef-duration-help"
+                inputMode="numeric"
               />
               <span style={st.unitBadge}>min</span>
             </div>
@@ -134,15 +147,37 @@ export default function EntryForm({
           disabled={disabled}
           style={st.textarea}
         />
-
+ {!canSubmit && (
+  <div style={st.helpText}>Ajoute au moins 1 minute ou 1 heure pour enregistrer.</div>
+)}
         {/* Actions */}
         <div style={st.actionsRow}>
-          <button type="submit" disabled={disabled || !taskId} style={s.primaryBtn}>
-            Enregistrer
+          <button type="submit" disabled={!canSubmit} style={s.primaryBtn}>
+            {isEditing ? 'Mettre à jour' : 'Enregistrer'}
           </button>
-          <button type="button" disabled={disabled} style={s.ghostBtnOnDark} onClick={onReset}>
-            Réinitialiser
-          </button>
+          
+
+          {isEditing ? (
+            <button
+              type="button"
+              disabled={disabled}
+              style={s.ghostBtnOnDark}
+              onClick={onCancelEdit}
+            >
+              Annuler la modification
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={disabled}
+              style={s.ghostBtnOnDark}
+              onClick={onReset}
+            >
+              Réinitialiser
+            </button>
+          )
+          }
+         
         </div>
       </form>
     </section>

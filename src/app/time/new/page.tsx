@@ -4,42 +4,51 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import s from '../../../components/dashboard/styles'; // 👉 adapte le chemin si besoin
-import {
-  useTimeJournal,
-  TimeHeader,
-  ProjectPicker,
-  EntryForm,
-  EntryList,
-  computeProgress,
-  st as timeSt,
-} from '../../../components/time_journal';
 
+// Boutons/looks dashboard
+import s from '../../../components/dashboard/styles';
+
+// Imports directs (adapte les chemins si besoin)
+import { useTimeJournal } from '../../../components/time_journal/hooks/useTimeJournal';
+import TimeHeader from '../../../components/time_journal/ui/TimeHeader';
+import ProjectPicker from '../../../components/time_journal/ui/ProjectPicker';
+import EntryForm from '../../../components/time_journal/ui/EntryForm';
+import EntryList from '../../../components/time_journal/ui/EntryList';
+import  st   from '../../../components/time_journal/timeStyles';
+import { computeProgress } from '../../../components/time_journal/utils';
 export default function TimePage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const userId = (session?.user as any)?.id as string | undefined;
 
   const j = useTimeJournal({ status: status as any, userId });
+
   const {
-    // selections
+    // sélections
     projects, projectId, setProjectId,
     tasks, taskId, setTaskId,
-    // form
-    entryDate, setEntryDate, hours, setHours, minutes, setMinutes, notes, setNotes, entryTitle, setEntryTitle,
-    // entries
-    entries, reloadEntries, handleCreateEntry, onDelete, onEdit, resetForm,
-    // state
-    loadingProjects, noProjects, errorMsg, currentProject, hasProjects, disabled,
 
+    // formulaire
+    entryDate, setEntryDate,
+    hours, setHours,
+    minutes, setMinutes,
+    notes, setNotes,
+    entryTitle, setEntryTitle,
+
+    // entries
+    entries, reloadEntries, handleSubmit, onDelete, onEdit, resetForm,
+
+    // état
+    loadingProjects, noProjects, errorMsg, currentProject, hasProjects, disabled,
+    isEditing, cancelEdit,
   } = j;
 
-  // Auth: redirige si non connecté
+  // Redirige si non connecté
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/auth/login');
   }, [status, router]);
 
-  // Redirection si pas de projets
+  // Redirection vers /dashboard si aucun projet
   useEffect(() => {
     if (status !== 'authenticated') return;
     if (!loadingProjects && noProjects) {
@@ -48,13 +57,13 @@ export default function TimePage() {
     }
   }, [status, loadingProjects, noProjects, router]);
 
-  // 🔢 Exemple de calcul de progression basé sur des heures cibles facultatives
+  // Progression (optionnel)
   const totalHours = entries.reduce((sum, e) => sum + (e.hoursLogged || 0), 0);
-  const targetHours = currentProject?.targetHours; // si tu l’ajoutes côté API
+  const targetHours = currentProject?.targetHours;
   const progressValue = computeProgress(totalHours, targetHours);
 
   return (
-    <div style={timeSt.container}>
+    <div style={st.container}>
       <TimeHeader
         status={status as any}
         loadingProjects={loadingProjects}
@@ -65,26 +74,26 @@ export default function TimePage() {
         progressValue={progressValue}
       />
 
-      <div style={timeSt.panelLight}>
-  <ProjectPicker
-    projects={projects}
-    projectId={projectId}
-    setProjectId={setProjectId}
-    disabled={disabled}
-  />
-</div>
-
+      {/* Bloc "picker" façon dashboard */}
+      <div style={st.panelLight}>
+        <ProjectPicker
+          projects={projects}
+          projectId={projectId}
+          setProjectId={setProjectId}
+          disabled={disabled}
+        />
+      </div>
 
       {/* CTA si aucun projet */}
       {status === 'authenticated' && !loadingProjects && !hasProjects && (
-        <div style={{ ...timeSt.card, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ ...st.card, display: 'flex', alignItems: 'center', gap: 12 }}>
           <span>Vous n’avez pas encore de projet.</span>
           <Link href="/dashboard" style={s.primaryBtn}>Créer un projet</Link>
         </div>
       )}
 
-      {/* Stack: form + entries */}
-      <div style={timeSt.stack}>
+      {/* Formulaire + liste */}
+      <div style={st.stack}>
         <EntryForm
           tasks={tasks}
           taskId={taskId}
@@ -97,20 +106,24 @@ export default function TimePage() {
           setMinutes={setMinutes}
           notes={notes}
           setNotes={setNotes}
+          entryTitle={entryTitle}
+          setEntryTitle={setEntryTitle}
           disabled={disabled}
-          onSubmit={handleCreateEntry}
+          onSubmit={handleSubmit}
           onReset={resetForm}
+          // mode édition
+          isEditing={isEditing}
+          onCancelEdit={cancelEdit}
           s={s}
-          entryTitle={entryTitle}   
-        setEntryTitle={setEntryTitle}
         />
 
         <EntryList
           entries={entries}
-          onEdit={onEdit}
+          onEdit={onEdit}                // <== IMPORTANT: EntryList doit appeler onEdit(entry), pas onEdit(id)
           onDelete={onDelete}
           onRefresh={() => reloadEntries(projectId || undefined)}
           hasProjects={hasProjects}
+          projectLabel={currentProject?.name}
           s={s}
         />
       </div>
