@@ -149,5 +149,20 @@ badgeDate: {
 background: 'rgba(99, 101, 241, 0.64)',  // indigo-500 à 20%
   color: '#E7E9FF',
 },
+refreshBtn: {
+  height: 36,
+  padding: '0 12px',
+  borderRadius: 10,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+},
+
+refreshIcon: {
+  width: 16,
+  height: 16,
+  display: 'inline-block',
+  transformOrigin: '50% 50%',
+},
 };
 export default st;

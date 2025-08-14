@@ -5,6 +5,7 @@ import st from '../timeStyles';
 import { EntryDTO } from '../types';
 import { formatDate, formatHours } from '../utils';
 
+
 type Props = {
   entries: EntryDTO[];
   onEdit: (e: EntryDTO) => void;
@@ -28,7 +29,7 @@ export default function EntryList({
     <section style={st.card}>
       <div style={st.sectionHead}>
         <h3 style={st.cardTitle}>Dernières entrées</h3>
-        <button type="button" style={s.ghostBtnOnDark} onClick={onRefresh} disabled={!hasProjects}>
+        <button type="button" style={{ ...s.ghostBtnOnDark, ...st.refreshBtn }} onClick={onRefresh} disabled={!hasProjects}>
           Rafraîchir
         </button>
       </div>
