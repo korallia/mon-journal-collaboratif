@@ -4,6 +4,7 @@ import React from 'react';
 import st from '../timeStyles';
 import { EntryDTO } from '../types';
 import { formatDate, formatHours } from '../utils';
+import { useRouter } from 'next/navigation';
 
 
 type Props = {
@@ -24,14 +25,22 @@ export default function EntryList({
   hasProjects,
   projectLabel,
   s,
-}: Props) {
+}: Props)
+ {
+    const router = useRouter();
   return (
     <section style={st.card}>
       <div style={st.sectionHead}>
         <h3 style={st.cardTitle}>Dernières entrées</h3>
-        <button type="button" style={{ ...s.ghostBtnOnDark, ...st.refreshBtn }} onClick={onRefresh} disabled={!hasProjects}>
+        <div style={s.topRight}>
+        <button type="button" style={{...s.secondaryBtnOnDark}} onClick={() => router.push('/time/list')} disabled={!hasProjects}>
+          Afficher la liste
+        </button>
+        <button type="button" style={s.ghostBtnOnDark} onClick={onRefresh} disabled={!hasProjects}>
           Rafraîchir
         </button>
+
+        </div>
       </div>
 
       <ul style={st.entryList}>
