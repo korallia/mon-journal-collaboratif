@@ -160,7 +160,8 @@ refreshBtn: {
 
 refreshIcon: {
   width: 16,
-  height: 16,
+  height: 40,
+  gap:8,
   display: 'inline-block',
   transformOrigin: '50% 50%',
 },

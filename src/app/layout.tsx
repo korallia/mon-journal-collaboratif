@@ -6,6 +6,9 @@ import SessionProviderWrapper from "./SessionProviderWrapper";
 import './globals.css';
 import PWAWrapper from '@/components/PWAWrapper';
 import { PWAInstallProvider } from '@/components/PWAInstallProvider';
+import { ToastProvider } from '@/components/toast/ToastProvider';
+import { ConfirmProvider } from '@/components/confirm/ConfirmProvider';
+
 
 
 
@@ -35,7 +38,11 @@ const session = await getServerSession(authOptions);
         <SessionProviderWrapper session={session}>
           <PWAWrapper />
           <PWAInstallProvider>
+             <ToastProvider>
+               <ConfirmProvider>
             {children}
+            </ConfirmProvider>
+            </ToastProvider>
           </PWAInstallProvider>
         </SessionProviderWrapper>
       </body>

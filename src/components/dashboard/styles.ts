@@ -30,7 +30,7 @@ export const globalPlaceholderCss = `
 
 export const s: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: 995,
+    maxWidth: 1000,
     margin: "40px auto",
     padding: "0 16px",
   },
@@ -104,12 +104,12 @@ export const s: Record<string, React.CSSProperties> = {
   },
 
   // Tableau
-  tableScroll: { width: "100%", overflowX: "hidden" },
+  tableScroll: { width: "100%", overflowX: "visible" },
   table: {
     width: "100%",
     borderCollapse: "separate",
     borderSpacing: "0 8px",
-    tableLayout: "auto",
+    tableLayout: "fixed",
   },
   th: {
     textAlign: "left",

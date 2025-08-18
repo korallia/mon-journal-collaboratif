@@ -24,3 +24,14 @@ export function computeProgress(totalHours: number, targetHours?: number) {
   const pct = (totalHours / targetHours) * 100;
   return Math.max(0, Math.min(100, Math.round(pct)));
 }
+export function toast(msg: string) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  Object.assign(el.style, {
+    position:'fixed', right:'16px', bottom:'16px', padding:'10px 12px',
+    background:'#0ea5e9', color:'#fff', borderRadius:'10px',
+    boxShadow:'0 8px 20px rgba(2,6,23,.25)', fontWeight:'700', zIndex:'9999'
+  });
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 1800);
+}
