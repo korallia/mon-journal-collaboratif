@@ -146,6 +146,7 @@ export const s: Record<string, React.CSSProperties> = {
     color: "#dbe4f0ff",
     cursor: "pointer",
     marginLeft: 4,
+    
   },
   dangerBtn: {
   padding: "8px 12px",          
