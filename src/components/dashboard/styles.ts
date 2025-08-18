@@ -30,7 +30,7 @@ export const globalPlaceholderCss = `
 
 export const s: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: 900,
+    maxWidth: 995,
     margin: "40px auto",
     padding: "0 16px",
   },
@@ -88,6 +88,7 @@ export const s: Record<string, React.CSSProperties> = {
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
+    width: '100%',
   },
 
   // Controls
@@ -127,7 +128,7 @@ export const s: Record<string, React.CSSProperties> = {
 
   // Conteneur des boutons d'action (desktop/table)
   projectActions: {
-    display: "flex",
+     display: 'flex', 
     gap: "8px",
     flexWrap: "wrap",
     justifyContent: "flex-end",
@@ -147,14 +148,19 @@ export const s: Record<string, React.CSSProperties> = {
     marginLeft: 4,
   },
   dangerBtn: {
-    padding: "8px 20px",
-    borderRadius: 8,
-    border: "1px solid rgba(255,255,255,.35)",
-    background: "#C62828",
-    color: "#dbe4f0ff",
-    cursor: "pointer",
-    marginLeft: 4,
-  },
+  padding: "8px 12px",          
+  height: 40,                  
+  display: "inline-flex",     
+  alignItems: "center",         
+  borderRadius: 8,
+  border: "1px solid rgba(255,255,255,.35)",
+  background: "#C62828",
+  color: "#dbe4f0ff",
+  cursor: "pointer",
+  marginLeft: 4,
+  lineHeight: 1,                
+},
+
   ghostBtnOnDark: {
     padding: "8px 12px",
     height: 40,

@@ -320,7 +320,7 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                                 flexWrap: isNarrow ? "wrap" : "nowrap",
                                 rowGap: 8,
                                 alignItems: "center",
-                                minWidth: isNarrow ? 0 : 320,
+                                minWidth:  0 ,
                               }}
                             >
                               {isEditing ? (
