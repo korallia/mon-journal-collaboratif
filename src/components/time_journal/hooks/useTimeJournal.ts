@@ -1,7 +1,10 @@
 'use client';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useMemo, useState } from 'react';
 import type { ProjectDTO, TaskDTO, EntryDTO } from '../types';
+import { useToast } from '@/components/toast/ToastProvider';
+import { useConfirm } from '@/components/confirm/ConfirmProvider';
 
 // ------------------- Endpoints -------------------
 const API = {
@@ -67,6 +70,9 @@ export function useTimeJournal(params: {
 }): UseTimeJournal {
   const { status, userId } = params;
 
+  const { success, error, promise } = useToast();
+  const  confirm  = useConfirm();
+
   // ------------------- Sélections -------------------
   const [projects, setProjects] = useState<ProjectDTO[]>([]);
   const [projectId, setProjectId] = useState<string>('');
@@ -123,11 +129,12 @@ export function useTimeJournal(params: {
       } catch (e: any) {
         setErrorMsg(e?.message ?? 'Erreur de chargement des projets.');
         setNoProjects(true);
+        error(e?.message ?? 'Erreur de chargement des projets.');
       } finally {
         setLoadingProjects(false);
       }
     })();
-  }, [status, userId]);
+  }, [status, userId, error]);
 
   // Changement de projet -> recharge tâches & entries
   useEffect(() => {
@@ -163,7 +170,7 @@ export function useTimeJournal(params: {
       const data: EntryDTO[] = (await r.json()) || [];
       const enriched = data.map((e) => ({
         ...e,
-        taskName: e.taskName || taskNameById.get(e.taskId) || 'Tâche',
+        taskName: (e as any).taskName || taskNameById.get(e.taskId) || 'Tâche',
       }));
       setEntries(enriched);
     })();
@@ -179,85 +186,116 @@ export function useTimeJournal(params: {
   }
 
   async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
+    e.preventDefault();
 
-  console.debug('[handleSubmit] projectId:', projectId, 'taskId:', taskId);
-  if (!projectId || !taskId) return;
+    if (!projectId) {
+      error('Aucun projet sélectionné.');
+      return;
+    }
+    if (!taskId) {
+      error('Choisis une tâche.');
+      return;
+    }
 
-  const totalHours = toHours(hours, minutes);
-  console.debug('[handleSubmit] totalHours:', totalHours);
-  if (totalHours <= 0) return;
+    const totalHours = toHours(hours, minutes);
+    if (totalHours <= 0) {
+      error('Ajoute au moins 1 minute ou 1 heure.');
+      return;
+    }
 
-  const payload = {
-    entryDate,
-    hoursLogged: totalHours,
-    notes: notes?.trim() || undefined,
-    title: entryTitle?.trim() || undefined,
-  };
+    const payload = {
+      entryDate,
+      hoursLogged: totalHours,
+      notes: notes?.trim() || undefined,
+      title: entryTitle?.trim() || undefined,
+    };
 
-  if (editingId) {
-    console.debug('[PATCH] /api/entries/' + editingId, payload);
-    const r = await fetch(API.entries.byId(editingId), {
-      method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    // ----- PATCH (éditer)
+    if (editingId) {
+      try {
+        const updated = await promise(
+          fetch(API.entries.byId(editingId), {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload),
+          }).then(async (r) => {
+            if (r.ok) return (await r.json()) as EntryDTO;
+            if (r.status === 404) {
+              const err: any = new Error('Entrée introuvable');
+              err.code = 'NOT_FOUND';
+              throw err;
+            }
+            let msg = '';
+            try { msg = (await r.json())?.error ?? ''; } catch {}
+            throw new Error(msg || 'Mise à jour impossible');
+          }),
+          { loading: 'Mise à jour…', success: 'Entrée mise à jour', error: 'Échec de la mise à jour' }
+        );
 
-    if (!r.ok) {
-      // lis le message d'erreur si dispo
-      let msg = '';
-      try { msg = (await r.json())?.error ?? ''; } catch {}
-      console.error('[PATCH failed]', r.status, msg);
+        (updated as any).taskName =
+          (updated as any).taskName || taskNameById.get(updated.taskId) || 'Tâche';
 
-      // Si 404 -> l’entrée n’existe plus (supprimée ailleurs) : on nettoie la liste et on quitte le mode édition
-      if (r.status === 404) {
-        setEntries(prev => prev.filter(e => e.id !== editingId));
+        setEntries((prev) => prev.map((it) => (it.id === updated.id ? updated : it)));
         setEditingId(null);
         resetForm();
-      } else {
-        alert('Échec de la modification: ' + (msg || r.status));
+      } catch (e: any) {
+        if (e?.code === 'NOT_FOUND') {
+          // Nettoie la liste et quitte le mode édition
+          setEntries((prev) => prev.filter((x) => x.id !== editingId));
+          setEditingId(null);
+          resetForm();
+        }
       }
       return;
     }
 
-    const updated: EntryDTO = await r.json();
-    updated.taskName = updated.taskName || taskNameById.get(updated.taskId) || 'Tâche';
-    setEntries(prev => prev.map(it => (it.id === updated.id ? updated : it)));
-    setEditingId(null);
-    resetForm();
-    return;
+    // ----- POST (créer)
+    try {
+      const created = await promise(
+        fetch(API.entries.create, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ ...payload, taskId }),
+        }).then(async (r) => {
+          if (r.ok) return (await r.json()) as EntryDTO;
+          let msg = '';
+          try { msg = (await r.json())?.error ?? ''; } catch {}
+          throw new Error(msg || 'Création impossible');
+        }),
+        { loading: 'Enregistrement…', success: 'Entrée ajoutée', error: 'Échec de l’enregistrement' }
+      );
+
+      (created as any).taskName =
+        (created as any).taskName || taskNameById.get(created.taskId) || 'Tâche';
+
+      setEntries((prev) => [created, ...prev]);
+      resetForm();
+    } catch {
+      // les toasts sont déjà gérés par promise()
+    }
   }
-
-  // ----- POST (créer)
-  console.debug('[POST] /api/entries', { ...payload, taskId });
-  const r = await fetch(API.entries.create, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ ...payload, taskId }),
-  });
-
-  if (!r.ok) {
-    let msg = '';
-    try { msg = (await r.json())?.error ?? ''; } catch {}
-    console.error('[POST failed]', r.status, msg);
-    alert('Échec de la création: ' + (msg || r.status));
-    return;
-  }
-
-  const created: EntryDTO = await r.json();
-  created.taskName = created.taskName || taskNameById.get(created.taskId) || 'Tâche';
-  setEntries(prev => [created, ...prev]);
-  resetForm();
-}
-
 
   async function onDelete(id: string) {
-    const ok = window.confirm('Supprimer cette entrée ?');
+    const ok = await confirm({
+      title: 'Supprimer cette entrée ?',
+      description: 'Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      tone: 'danger',
+    });
     if (!ok) return;
-    const r = await fetch(API.entries.byId(id), { method: 'DELETE' });
-    if (r.ok || r.status === 204) {
+
+    try {
+      await promise(
+        fetch(API.entries.byId(id), { method: 'DELETE' }).then((r) =>
+          r.ok || r.status === 204 ? true : Promise.reject(new Error('Suppression impossible'))
+        ),
+        { loading: 'Suppression…', success: 'Entrée supprimée', error: 'Échec de la suppression' }
+      );
       setEntries((prev) => prev.filter((e) => e.id !== id));
       setEditingId((old) => (old === id ? null : old));
+    } catch {
+      // toast déjà géré
     }
   }
 
@@ -271,11 +309,13 @@ export function useTimeJournal(params: {
     setMinutes(m);
     setNotes(entry.notes || '');
     setEntryTitle(entry.title || '');
+    success('Mode édition activé'); // petit feedback sympa
   }
 
   function cancelEdit() {
     setEditingId(null);
     resetForm();
+    success('Modification annulée');
   }
 
   return {
