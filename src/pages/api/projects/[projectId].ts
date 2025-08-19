@@ -1,54 +1,42 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { Prisma } from '@prisma/client'
-import { ProjectService } from '@/services/ProjectService'
+// pages/api/projects/[projectId].ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '@prisma/client';
 
-const projectService = new ProjectService()
+const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // projectId peut être string | string[] | undefined
-  const projectIdParam = req.query.projectId
-  const projectId = Array.isArray(projectIdParam) ? projectIdParam[0] : projectIdParam
-  if (!projectId) return res.status(400).json({ message: 'projectId manquant.' })
+  const { projectId } = req.query;
+  if (typeof projectId !== 'string') {
+    return res.status(400).json({ message: 'Paramètre projectId invalide.' });
+  }
 
   try {
-    switch (req.method) {
-      case 'GET': {
-        const project = await projectService.getById(projectId)
-        if (!project) return res.status(404).json({ message: 'Projet introuvable.' })
-        return res.status(200).json(project)
-      }
-      case 'PUT': {
-        const { name, description } = req.body ?? {}
-        if (name === undefined && description === undefined) {
-          return res.status(400).json({ message: 'Aucun champ à mettre à jour.' })
-        }
-        const updated = await projectService.update(projectId, { name, description })
-        return res.status(200).json(updated)
-      }
-      case 'DELETE': {
-        await projectService.delete(projectId)
-        return res.status(204).end()
-      }
-      default: {
-        res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
-        return res.status(405).json({ message: `Méthode ${req.method} non autorisée.` })
-      }
+    if (req.method === 'GET') {
+      const project = await prisma.project.findUnique({ where: { id: projectId } });
+      if (!project) return res.status(404).json({ message: 'Projet introuvable.' });
+      return res.status(200).json(project);
     }
-  } catch (err: unknown) {
-    // ↓ raffine le type
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      // delete/update sur id inexistant => P2025
-      if (err.code === 'P2025') {
-        return res.status(404).json({ message: 'Projet introuvable.' })
-      }
-      // autres erreurs Prisma connues
-      return res.status(400).json({ message: err.message })
+
+    if (req.method === 'PUT' || req.method === 'PATCH') {
+      const { name } = req.body as { name?: string };
+      if (!name) return res.status(400).json({ message: 'Le champ name est requis.' });
+
+      const project = await prisma.project.update({
+        where: { id: projectId },
+        data: { name },
+      });
+      return res.status(200).json(project);
     }
-    if (err instanceof Error) {
-      console.error(err)
-      return res.status(500).json({ message: err.message })
+
+    if (req.method === 'DELETE') {
+      await prisma.project.delete({ where: { id: projectId } });
+      return res.status(204).end();
     }
-    console.error(err)
-    return res.status(500).json({ message: 'Erreur serveur.' })
+
+    res.setHeader('Allow', ['GET', 'PUT', 'PATCH', 'DELETE']);
+    return res.status(405).json({ message: 'Méthode non autorisée.' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Erreur serveur.' });
   }
 }
