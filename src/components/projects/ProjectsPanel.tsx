@@ -18,7 +18,7 @@ export type ProjectDTO = {
 const API = {
   listByUser: (userId: string) => `/api/projects/user/${userId}`,
   create: `/api/projects`,
-  byId:   (id: string) => `/api/projects/${id}`,
+  byId: (id: string) => `/api/projects/${id}`,
 };
 
 type Props = {
@@ -26,23 +26,39 @@ type Props = {
   onCountChange?: (n: number) => void;
 };
 
+// Scrollbar fine pour les conteneurs horizontaux (optionnel)
+const globalScrollCss = `
+  .dash-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100,116,139,.45) transparent;
+  }
+  .dash-scroll::-webkit-scrollbar { height: 6px; }
+  .dash-scroll::-webkit-scrollbar-track { background: transparent; }
+  .dash-scroll::-webkit-scrollbar-thumb {
+    background: rgba(100,116,139,.45);
+    border-radius: 9999px;
+  }
+  .dash-scroll::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,.6); }
+`;
+
 export default function ProjectsPanel({ userId, onCountChange }: Props) {
   const confirm = useConfirm();
   const { error, promise } = useToast();
 
-  const [projects, setProjects]   = useState<ProjectDTO[]>([]);
-  const [loading, setLoading]     = useState(false);
-  const [newName, setNewName]     = useState("");
+  const [projects, setProjects] = useState<ProjectDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName]   = useState("");
+  const [editName, setEditName] = useState("");
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
 
-  const [isMobile, setIsMobile] = useState(false);
-  const [isNarrow, setIsNarrow] = useState(false);
+  // responsive
+  const [isMobile, setIsMobile] = useState(false);  // < 640px => cartes
+  const [isNarrow, setIsNarrow] = useState(false);  // < 980px => actions + étroites
 
   useEffect(() => {
     const mqMobile = window.matchMedia("(max-width: 640px)");
-    const mqNarrow = window.matchMedia("(max-width: 900px)");
+    const mqNarrow = window.matchMedia("(max-width: 980px)");
     const update = () => {
       setIsMobile(mqMobile.matches);
       setIsNarrow(mqNarrow.matches);
@@ -76,6 +92,12 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
     onCountChange?.(projects.length);
   }, [projects.length, onCountChange]);
 
+  // tes largeurs actuelles
+  const actionsColWidth = isNarrow ? 310 : 380;
+  const timeColWidth = 120;
+  const dateColWidth = 210;
+
+  // placeholder "temps total"
   function getRandomTime(): string {
     const h = Math.floor(Math.random() * 10);
     const m = Math.floor(Math.random() * 60);
@@ -90,7 +112,9 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ name: newName.trim(), userId }),
-        }).then((r) => (r.ok ? r.json() : Promise.reject(new Error("Création impossible")))),
+        }).then((r) =>
+          r.ok ? r.json() : Promise.reject(new Error("Création impossible"))
+        ),
         { loading: "Création…", success: "Projet créé !", error: "Échec de la création" }
       );
       setProjects((prev) => [created as ProjectDTO, ...prev]);
@@ -115,7 +139,9 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
           method: "PUT",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ name: editName.trim() }),
-        }).then((r) => (r.ok ? r.json() : Promise.reject(new Error("Mise à jour impossible")))),
+        }).then((r) =>
+          r.ok ? r.json() : Promise.reject(new Error("Mise à jour impossible"))
+        ),
         { loading: "Enregistrement…", success: "Projet modifié", error: "Échec de la modification" }
       );
       setProjects((prev) => prev.map((p) => (p.id === id ? (updated as ProjectDTO) : p)));
@@ -155,6 +181,11 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
 
   return (
     <>
+      {/* styles globaux placés en haut (évite le “nested styled-jsx”) */}
+      <style jsx global>{globalScrollCss}</style>
+      <style jsx global>{globalPlaceholderCss}</style>
+
+      {/* Création */}
       <section style={s.card}>
         <h2 style={{ fontSize: "1.2rem", margin: "0 0 8px 0" }}>Nouveau projet</h2>
         <div style={s.row}>
@@ -165,102 +196,224 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
             className={classes.textInput}
             style={s.input}
           />
-          <style jsx global>{globalPlaceholderCss}</style>
           <button onClick={createProject} style={s.primaryBtn} disabled={!newName.trim() || loading}>
             Créer
           </button>
         </div>
       </section>
 
+      {/* Liste */}
       <section style={s.card}>
         <h2 style={{ fontSize: "1.2rem", margin: "0 0 8px 0" }}>Mes projets</h2>
-        <div style={s.tableScroll}>
-          <table style={s.table}>
-            <thead>
-              <tr style={{ background: "#E5EAF1" }}>
-                <th style={s.th}>Nom</th>
-                <th style={{ ...s.th, width: 220 }}>Créé le</th>
-                <th style={{ ...s.th, width: 220 }}>Modifié le</th>
-                <th style={{ ...s.th, width: 140 }}>Temps total</th>
-                <th style={{ ...s.th, width: isNarrow ? "280px" : "360px", textAlign: "center" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.length === 0 ? (
-                <tr>
-                  <td colSpan={5}>
-                    <p style={{ ...s.muted, margin: "16px 0" }}>
-                      {loading ? "Chargement…" : "Aucun projet pour l’instant."}
-                    </p>
-                  </td>
-                </tr>
-              ) : (
-                projects.map((p) => {
-                  const isEditing = editingId === p.id;
-                  const isOpen    = openProjectId === p.id;
 
-                  return (
-                    <Fragment key={p.id}>
-                      <tr style={s.projectRow}>
-                        <td style={{ ...s.projectCell, ...s.projectCellFirst }}>
-                          {isEditing ? (
-                            <input
-                              value={editName}
-                              onChange={(e) => setEditName(e.target.value)}
-                              className={classes.textInput}
-                              style={s.input}
-                            />
-                          ) : (
-                            p.name
-                          )}
-                        </td>
-                        <td style={s.projectCell}>{formatDateShort(p.createdAt)}</td>
-                        <td style={s.projectCell}>{formatDateShort(p.updatedAt)}</td>
-                        <td style={{ ...s.projectCell, fontWeight: 600 }}>{getRandomTime()}</td>
-                        <td style={{ ...s.projectCell, ...s.projectCellLast }}>
-                          <div style={{
-                            ...s.projectActions,
-                            flexWrap: isNarrow ? "wrap" : "nowrap",
-                            rowGap: 8,
-                            alignItems: "center",
-                            minWidth: isNarrow ? 0 : 320,
-                          }}>
+        {/* Mobile < 640px : cartes */}
+        {isMobile ? (
+          <ul style={s.listReset}>
+            {projects.length === 0 ? (
+              <li>
+                <p style={{ ...s.muted, margin: "4px 0" }}>
+                  {loading ? "Chargement…" : "Aucun projet pour l’instant."}
+                </p>
+              </li>
+            ) : (
+              projects.map((p) => {
+                const isEditing = editingId === p.id;
+                const isOpen = openProjectId === p.id;
+
+                return (
+                  <li key={p.id} style={s.projectCard}>
+                    {/* Nom */}
+                    <div style={s.projectName}>
+                      {isEditing ? (
+                        <input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          style={s.input}
+                          className={classes.textInput}
+                        />
+                      ) : (
+                        p.name
+                      )}
+                    </div>
+
+                    {/* Méta */}
+                    <div style={s.metaGrid}>
+                      <div>
+                        <div style={s.metaLabel}>Créé le</div>
+                        <div style={s.metaValue}>{formatDateShort(p.createdAt)}</div>
+                      </div>
+                      <div>
+                        <div style={s.metaLabel}>Modifié le</div>
+                        <div style={s.metaValue}>{formatDateShort(p.updatedAt)}</div>
+                      </div>
+                      <div>
+                        <div style={s.metaLabel}>Temps total</div>
+                        <div style={s.metaValue}>{getRandomTime()}</div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div style={s.actionsRow}>
+                      {isEditing ? (
+                        <>
+                          <button onClick={() => saveEdit(p.id)} style={s.primaryBtn}>
+                            Enregistrer
+                          </button>
+                          <button onClick={cancelEdit} style={s.ghostBtnOnDark}>
+                            Annuler
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => beginEdit(p)} style={s.ghostBtnOnDark}>
+                            Modifier
+                          </button>
+                          <button onClick={() => remove(p.id)} style={s.dangerBtn}>
+                            Supprimer
+                          </button>
+                          <button
+                            onClick={() => setOpenProjectId(isOpen ? null : p.id)}
+                            style={s.secondaryBtnOnDark}
+                          >
+                            {isOpen ? "Fermer tâches" : "Tâches"}
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Tâches */}
+                    {isOpen && (
+                      <div style={{ ...s.accordionCell, marginTop: 12 }}>
+                        <TasksAccordion projectId={p.id} isOpen={isOpen} />
+                      </div>
+                    )}
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        ) : (
+          // Desktop / tablette : tableau
+          <div className="dash-scroll" style={{ ...s.tableScroll, WebkitOverflowScrolling: "touch" }}>
+            <table style={s.table}>
+              <colgroup>
+                <col style={{ width: "auto" }} />
+                <col style={{ width: dateColWidth }} />
+                <col style={{ width: dateColWidth }} />
+                <col style={{ width: timeColWidth }} />
+                <col style={{ width: actionsColWidth }} />
+              </colgroup>
+
+              <thead>
+                <tr style={{ background: "#E5EAF1" }}>
+                  <th style={s.th}>Nom</th>
+                  <th style={{ ...s.th, width: dateColWidth }}>Créé le</th>
+                  <th style={{ ...s.th, width: dateColWidth }}>Modifié le</th>
+                  <th style={{ ...s.th, width: timeColWidth }}>Temps total</th>
+                  <th style={{ ...s.th, width: actionsColWidth, textAlign: "center" }}>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {projects.length === 0 ? (
+                  <tr>
+                    <td colSpan={5}>
+                      <p style={{ ...s.muted, margin: "16px 0" }}>
+                        {loading ? "Chargement…" : "Aucun projet pour l’instant."}
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  projects.map((p) => {
+                    const isEditing = editingId === p.id;
+                    const isOpen = openProjectId === p.id;
+
+                    return (
+                      <Fragment key={p.id}>
+                        <tr style={s.projectRow}>
+                          {/* Nom */}
+                          <td style={{ ...s.projectCell, ...s.projectCellFirst }}>
                             {isEditing ? (
-                              <>
-                                <button onClick={() => saveEdit(p.id)} style={s.primaryBtn}>Enregistrer</button>
-                                <button onClick={cancelEdit} style={s.ghostBtnOnDark}>Annuler</button>
-                              </>
+                              <input
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className={classes.textInput}
+                                style={s.input}
+                              />
                             ) : (
-                              <>
-                                <button onClick={() => beginEdit(p)} style={s.ghostBtnOnDark}>Modifier</button>
-                                <button onClick={() => remove(p.id)} style={s.dangerBtn}>Supprimer</button>
-                                <button onClick={() => setOpenProjectId(isOpen ? null : p.id)} style={s.secondaryBtnOnDark}>
-                                  {isOpen ? "Fermer tâches" : "Tâches"}
-                                </button>
-                              </>
+                              p.name
                             )}
-                          </div>
-                        </td>
-                      </tr>
-                      {isOpen && (
-                        <tr key={`${p.id}-tasks`}>
-                          <td colSpan={5} style={{
-                            padding: "0 8px 10px 8px",
-                            background: "#3b4861ff",
-                            borderBottomLeftRadius: 16,
-                            borderBottomRightRadius: 16,
-                          }}>
-                            <TasksAccordion projectId={p.id} isOpen={isOpen} />
+                          </td>
+
+                          {/* Dates */}
+                          <td style={{ ...s.projectCell, whiteSpace: "nowrap" }}>
+                            {formatDateShort(p.createdAt)}
+                          </td>
+                          <td style={{ ...s.projectCell, whiteSpace: "nowrap" }}>
+                            {formatDateShort(p.updatedAt)}
+                          </td>
+
+                          {/* Temps */}
+                          <td style={{ ...s.projectCell, fontWeight: 600, whiteSpace: "nowrap" }}>
+                            {getRandomTime()}
+                          </td>
+
+                          {/* Actions */}
+                          <td style={{ ...s.projectCell, ...s.projectCellLast }}>
+                            <div style={s.projectActions}>
+                              {isEditing ? (
+                                <>
+                                  <button onClick={() => saveEdit(p.id)} style={s.primaryBtn}>
+                                    Enregistrer
+                                  </button>
+                                  <button onClick={cancelEdit} style={s.ghostBtnOnDark}>
+                                    Annuler
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button onClick={() => beginEdit(p)} style={s.ghostBtnOnDark}>
+                                    Modifier
+                                  </button>
+                                  <button onClick={() => remove(p.id)} style={s.dangerBtn}>
+                                    Supprimer
+                                  </button>
+                                  <button
+                                    onClick={() => setOpenProjectId(isOpen ? null : p.id)}
+                                    style={s.secondaryBtnOnDark}
+                                  >
+                                    {isOpen ? "Fermer tâches" : "Tâches"}
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
-                      )}
-                    </Fragment>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+
+                        {/* Accordéon tâches */}
+                        {isOpen && (
+                          <tr key={`${p.id}-tasks`}>
+                            <td
+                              colSpan={5}
+                              style={{
+                                padding: "0 8px 10px 8px",
+                                background: "#3b4861ff",
+                                borderBottomLeftRadius: 16,
+                                borderBottomRightRadius: 16,
+                              }}
+                            >
+                              <TasksAccordion projectId={p.id} isOpen={isOpen} />
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </>
   );
