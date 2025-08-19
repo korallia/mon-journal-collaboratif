@@ -60,7 +60,7 @@ const st: Record<string, React.CSSProperties> = {
 
   badge: {
     background: '#4169E1', color: '#dbe4f0ff', borderRadius: 9999, padding: '2px 8px', fontSize: 12,
-    marginRight: 8, display: 'inline-block',
+    marginRight: 8, display: 'inline-block', boxShadow:'inset 0 0 0 2px rgba(255,255,255,.08)'
   },
 
   panelLight: {
@@ -102,6 +102,7 @@ unitBadge: {
   color: '#475569',         // sur input blanc
   opacity: 0.9,
   pointerEvents: 'none',
+   boxShadow:'inset 0 0 0 2px rgba(255,255,255,.08)'
 },
 helpText: {
   fontSize: 12,
@@ -133,21 +134,25 @@ badgeProject: {
   background: '#4169E1',         // bleu royal
   color: '#E9F1FF',
    cursor: 'default',
+    boxShadow:'inset 0 0 0 2px rgba(255,255,255,.08)'
 },
 
 badgeTask: {
    background: 'rgba(148, 163, 184, 0.64)', // slate-400 à 18%
   color: '#E5ECF5',
+   boxShadow:'inset 0 0 0 2px rgba(255,255,255,.08)'
 },
 
 badgeHours: {
 background: 'rgba(22, 163, 74, 0.64)',   // green-600 à 20%
   color: '#CFF6D4',
+   boxShadow:'inset 0 0 0 2px rgba(255,255,255,.08)'
 },
 
 badgeDate: {
 background: 'rgba(99, 101, 241, 0.64)',  // indigo-500 à 20%
   color: '#E7E9FF',
+   boxShadow:'inset 0 0 0 2px rgba(255,255,255,.08)'
 },
 refreshBtn: {
   height: 36,
@@ -160,7 +165,8 @@ refreshBtn: {
 
 refreshIcon: {
   width: 16,
-  height: 16,
+  height: 40,
+  gap:8,
   display: 'inline-block',
   transformOrigin: '50% 50%',
 },

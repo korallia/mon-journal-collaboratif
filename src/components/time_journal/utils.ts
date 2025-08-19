@@ -24,3 +24,4 @@ export function computeProgress(totalHours: number, targetHours?: number) {
   const pct = (totalHours / targetHours) * 100;
   return Math.max(0, Math.min(100, Math.round(pct)));
 }
+

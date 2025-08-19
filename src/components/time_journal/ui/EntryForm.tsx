@@ -38,6 +38,7 @@ export default function EntryForm({
 }: Props) {
   const hasTasks = tasks.length > 0;
   const canSubmit = !disabled && !!taskId && (hours > 0 || minutes > 0);
+  
 
   return (
     <section style={{ ...st.card, ...(disabled ? { opacity: 0.7 } : null) }}>
@@ -152,6 +153,7 @@ export default function EntryForm({
 )}
         {/* Actions */}
         <div style={st.actionsRow}>
+          
           <button type="submit" disabled={!canSubmit} style={s.primaryBtn}>
             {isEditing ? 'Mettre à jour' : 'Enregistrer'}
           </button>
