@@ -155,14 +155,8 @@ export default function Page() {
             </div>
           </div>
           <div style={st.heroRight}>
-            <button
-              type="button"
-              onClick={() => router.push('/time/new')}
-              style={s.outBtnOnDark}
-              title="Aller au journal de temps"
-            >
-              Journal de temps
-            </button>
+            <a href="/dashboard" style={s.primaryBtn}>Dashboard</a>
+            <a href="/time/new" style={s.ghostBtnOnDark}>Journal de temps</a>
           </div>
         </div>
       </div>
