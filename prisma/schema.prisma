@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"        // adapte si nécessaire
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,56 +13,49 @@ model User {
   email     String     @unique
   password  String
   createdAt DateTime   @default(now())
-
   posts     BlogPost[]
   projects  Project[]
 }
 
 model Project {
-  id           String   @id @default(cuid())
-  userId       String
-  name         String
-  description  String?  @db.Text
-  targetHours  Decimal? @db.Decimal(8, 2)
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tasks  Task[]
+  id          String   @id @default(cuid())
+  name        String
+  userId      String
+  createdAt   DateTime @default(now())
+  description String?
+  targetHours Decimal? @db.Decimal(8, 2)
+  updatedAt   DateTime @default(now()) @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks       Task[]
 
   @@index([userId])
   @@index([name])
 }
 
 model Task {
-  id         String   @id @default(cuid())
-  projectId  String
-  title      String
-  done       Boolean  @default(false)
+  id        String   @id @default(cuid())
+  title     String
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  done      Boolean  @default(false)
+  entries   Entry[]
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  entries Entry[]
-
-  @@index([projectId])
   @@unique([projectId, title])
+  @@index([projectId])
 }
 
 model Entry {
-  id           String   @id @default(cuid())
-  taskId       String
-  entryDate    DateTime                      // stockée en UTC
-  hoursLogged  Decimal  @db.Decimal(6, 2)    // ex: 1.50 = 1h30
-  title        String?
-  notes        String?  @db.Text
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
-
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  taskId      String
+  entryDate   DateTime
+  hoursLogged Decimal  @db.Decimal(6, 2)
+  title       String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
   @@index([entryDate])
@@ -74,6 +67,5 @@ model BlogPost {
   content   String
   userId    String
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }

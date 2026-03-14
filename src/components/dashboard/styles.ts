@@ -7,21 +7,24 @@ export const classes = {
 
 // CSS global pour styler les placeholders comme l’entête "Nom"
 export const globalPlaceholderCss = `
-  .${classes.textInput}::placeholder,
-  .${classes.textInput}::-webkit-input-placeholder,
-  .${classes.textInput}::-moz-placeholder,
-  .${classes.textInput}:-ms-input-placeholder,
-  .${classes.textInput}::-ms-input-placeholder {
-    color: #6b7280 !important;
+  /* 1. On cible tous les moteurs de recherche pour l'état NORMAL */
+  .${classes.textInput}::placeholder { color: #94a3b8ortant; opacity:0.5 !important; font-weight: 600; }
+  .${classes.textInput}::-webkit-input-placeholder { color: #94a3b8ortant; opacity: 0.5 !important; font-weight: 600; }
+  .${classes.textInput}::-moz-placeholder { color: #94a3b8ortant; opacity: 0.5 !important; font-weight: 600; }
+  .${classes.textInput}:-ms-input-placeholder { color: #94a3b8ortant; opacity: 0.5 !important; font-weight: 600; }
+
+  /* 2. On force l'état FOCUS à être EXACTEMENT pareil */
+  .${classes.textInput}:focus::placeholder { 
+    color: #6b7280 !important; 
+    opacity: 0.5 !important; 
     font-weight: 600;
-    letter-spacing: 0.01em;
-    opacity: 1;
+    text-align: left !important;
   }
-  .${classes.textInput}:focus::placeholder {
-    color: #94a3b8 !important;
-    font-weight: 600;
-  }
+  .${classes.textInput}:focus::-webkit-input-placeholder { color: #6b7280 !important; opacity: 0.5 !important; }
+  .${classes.textInput}:focus::-moz-placeholder { color: #6b7280 !important; opacity: 0.5 !important; }
 `;
+
+
 
 export const s: Record<string, React.CSSProperties> = {
   container: {
@@ -84,6 +87,9 @@ export const s: Record<string, React.CSSProperties> = {
     padding: 16,
     marginBottom: 16,
     width: "100%",
+    display: 'flex',
+  flexDirection: 'column', // ou row selon ton design
+  minWidth: 0, // <--- C'EST LA CLÉ
   },
 
   // Controls
@@ -118,13 +124,13 @@ export const s: Record<string, React.CSSProperties> = {
   // Lignes de projet
   projectRow: { background: "#232e41ff", color: "#dbe4f0ff", borderRadius: 16 },
   projectCell: {
-    padding: "8px 8px",
+   padding: "12px 8px",
+    overflow: "hidden",       // Empêche le contenu de déborder
+    whiteSpace: "nowrap",    // Force le texte sur une seule ligne
+    textOverflow: "ellipsis", // Ajoute "..." si c'est trop long
     verticalAlign: "middle",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
   },
-  projectCellFirst: { borderTopLeftRadius: 16, borderBottomLeftRadius: 16 },
+  projectCellFirst: { borderTopLeftRadius: 16, borderBottomLeftRadius: 16, },
   projectCellLast: { borderTopRightRadius: 16, borderBottomRightRadius: 16 },
 
   // Stack "Dates" pour tablette
@@ -133,6 +139,7 @@ export const s: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: 2,
     lineHeight: 1.25,
+    paddingLeft: "8px",
   },
   metaTiny: { fontSize: 12, color: "rgba(255,255,255,.75)" },
 
@@ -263,8 +270,19 @@ export const s: Record<string, React.CSSProperties> = {
   taskLabel: { display: "flex", alignItems: "center", gap: 8 },
 
   // Mobile cards
-  listReset: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 },
-  projectCard: { background: "#1E293B", color: "#dbe4f0ff", borderRadius: 16, padding: 12 },
+  listReset: { listStyle: "none", 
+  padding: 0, 
+  margin: 0, 
+  display: "grid", 
+  gap: 12,
+  gridTemplateColumns: "minmax(0, 1fr)", // FORCE la colonne à ne pas dépasser le parent
+  width: "100%",},
+  projectCard: { background: "#1E293B", 
+  color: "#dbe4f0ff", 
+  borderRadius: 16, 
+  padding: 12,
+  minWidth: 0, // <--- CRUCIAL
+  overflow: "hidden" },
   projectName: { fontWeight: 700, fontSize: "1rem", margin: "0 0 6px 0" },
   metaGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 4 },
   metaLabel: { fontSize: 12, color: "rgba(255,255,255,.7)" },
@@ -273,3 +291,23 @@ export const s: Record<string, React.CSSProperties> = {
 };
 
 export default s;
+export const tabletFixes = `
+  @media (min-width: 641px) and (max-width: 1200px) {
+    /* 1. On empêche les colonnes d'avoir une taille fixe forcée */
+    .dash-table { 
+      table-layout: auto !important; 
+    }
+    
+    /* 2. On réduit la police et le padding pour gagner de l'espace horizontal */
+    .dash-table th, .dash-table td {
+      font-size: 13px !important;
+      padding: 8px 4px !important;
+    }
+
+    /* 3. On empêche le texte de se chevaucher en permettant le retour à la ligne */
+    .dash-cell-name {
+      white-space: normal !important;
+      min-width: 100px;
+    }
+  }
+`;

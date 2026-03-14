@@ -26,13 +26,12 @@ type Props = {
   onCountChange?: (n: number) => void;
 };
 
-// Helper responsive flags
 function useBreakpoints() {
   const [flags, setFlags] = useState({ isPhone: false, isTablet: false, isDesktop: true });
 
   useEffect(() => {
     const mqPhone = window.matchMedia("(max-width: 640px)");
-    const mqTablet = window.matchMedia("(max-width: 1024px)");
+    const mqTablet = window.matchMedia("(max-width: 1200px)");
     const update = () =>
       setFlags({
         isPhone: mqPhone.matches,
@@ -88,8 +87,7 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
       return { dateW: 210, timeW: 120, actionsW: 360, mode: "desktop" as const };
     }
     if (isTablet) {
-      // Col "Dates" unique, boutons compacts
-      return { dateW: 260, timeW: 90, actionsW: 270, mode: "tablet" as const };
+      return { dateW: 240, timeW: 90, actionsW: 260, mode: "tablet" as const };
     }
     return { dateW: 0, timeW: 0, actionsW: 0, mode: "phone" as const };
   }, [isDesktop, isTablet]);
@@ -171,10 +169,10 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  // --- Mobile (cartes)
   if (isPhone) {
     return (
       <>
+        <style jsx global>{globalPlaceholderCss}</style>
         <section style={s.card}>
           <h2 style={{ fontSize: "1.2rem", margin: "0 0 8px 0" }}>Nouveau projet</h2>
           <div style={s.row}>
@@ -185,7 +183,6 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
               className={classes.textInput}
               style={s.input}
             />
-            <style jsx global>{globalPlaceholderCss}</style>
             <button onClick={createProject} style={s.primaryBtn} disabled={!newName.trim() || loading}>
               Créer
             </button>
@@ -205,7 +202,9 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                 const isOpen = openProjectId === p.id;
                 return (
                   <li key={p.id} style={s.projectCard}>
-                    <div style={s.projectName}>
+                    <div style={{ 
+                      ...s.projectName, 
+                    }}>
                       {isEditing ? (
                         <input
                           value={editName}
@@ -214,7 +213,14 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                           style={s.input}
                         />
                       ) : (
-                        p.name
+                        <span style={{ 
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: 'block'
+                              }}>
+                        {p.name}
+                        </span>
                       )}
                     </div>
                     <div style={s.metaGrid}>
@@ -237,21 +243,13 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                     <div style={s.actionsRow}>
                       {isEditing ? (
                         <>
-                          <button onClick={() => saveEdit(p.id)} style={s.primaryBtn}>
-                            Enregistrer
-                          </button>
-                          <button onClick={cancelEdit} style={s.ghostBtnOnDark}>
-                            Annuler
-                          </button>
+                          <button onClick={() => saveEdit(p.id)} style={s.primaryBtn}>Enregistrer</button>
+                          <button onClick={cancelEdit} style={s.ghostBtnOnDark}>Annuler</button>
                         </>
                       ) : (
                         <>
-                          <button onClick={() => beginEdit(p)} style={s.ghostBtnOnDark}>
-                            Modifier
-                          </button>
-                          <button onClick={() => remove(p.id)} style={s.dangerBtn}>
-                            Supprimer
-                          </button>
+                          <button onClick={() => beginEdit(p)} style={s.ghostBtnOnDark}>Modifier</button>
+                          <button onClick={() => remove(p.id)} style={s.dangerBtn}>Supprimer</button>
                           <button
                             onClick={() => setOpenProjectId(isOpen ? null : p.id)}
                             style={s.secondaryBtnOnDark}
@@ -277,9 +275,25 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
     );
   }
 
-  // --- Desktop & tablette (tableau)
   return (
     <>
+      <style jsx global>{`
+        @media (max-width: 1200px) {
+          .dash-table { 
+            table-layout: auto !important; 
+          }
+          .cell-name {
+            white-space: normal !important;
+            min-width: 120px !important;
+            word-break: break-word;
+          }
+          .dash-table td {
+            padding: 8px 6px !important;
+          }
+        }
+      `}</style>
+      <style jsx global>{globalPlaceholderCss}</style>
+
       <section style={s.card}>
         <h2 style={{ fontSize: "1.2rem", margin: "0 0 8px 0" }}>Nouveau projet</h2>
         <div style={s.row}>
@@ -290,7 +304,6 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
             className={classes.textInput}
             style={s.input}
           />
-          <style jsx global>{globalPlaceholderCss}</style>
           <button onClick={createProject} style={s.primaryBtn} disabled={!newName.trim() || loading}>
             Créer
           </button>
@@ -301,7 +314,7 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
         <h2 style={{ fontSize: "1.2rem", margin: "0 0 8px 0" }}>Mes projets</h2>
 
         <div style={s.tableScroll}>
-          <table style={s.table}>
+          <table style={s.table} className="dash-table">
             <colgroup>
               <col style={{ width: "auto" }} />
               {COLS.mode === "desktop" ? (
@@ -318,15 +331,21 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
 
             <thead>
               <tr style={{ background: "#E5EAF1" }}>
-                <th style={s.th}>Nom</th>
+                
+               
                 {COLS.mode === "desktop" ? (
                   <>
+                    <th style={{...s.th}}>Nom</th>
                     <th style={{ ...s.th, width: COLS.dateW }}>Créé le</th>
                     <th style={{ ...s.th, width: COLS.dateW }}>Modifié le</th>
                   </>
                 ) : (
+                  <>
+                   <th style={{...s.th, width:COLS.timeW}}>Nom</th>
                   <th style={{ ...s.th, width: COLS.dateW }}>Dates</th>
+                  </>
                 )}
+
                 <th style={{ ...s.th, width: COLS.timeW }}>Temps total</th>
                 <th style={{ ...s.th, width: COLS.actionsW, textAlign: "center" }}>Actions</th>
               </tr>
@@ -349,79 +368,65 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                   return (
                     <Fragment key={p.id}>
                       <tr style={s.projectRow}>
-                        {/* Nom */}
-                        <td style={{ ...s.projectCell, ...s.projectCellFirst }}>
-                          {isEditing ? (
-                            <input
-                              value={editName}
-                              onChange={(e) => setEditName(e.target.value)}
-                              className={classes.textInput}
-                              style={s.input}
-                            />
-                          ) : (
-                            p.name
-                          )}
-                        </td>
-
-                        {/* Dates */}
+                        <td 
+                            style={{ 
+                              ...s.projectCell, 
+                              ...s.projectCellFirst, 
+                            }} 
+                            className="cell-name"
+                          >
+                            {isEditing ? (
+                              <input
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className={classes.textInput}
+                                style={{ ...s.input, width: '100%', }} // L'input prend toute la place dispo
+                              />
+                            ) : (
+                              <span style={{ 
+                               width: '100%',           // Utilise toute la place de la cellule
+                                maxWidth: '180px',       // Légèrement moins que la cellule pour respirer
+                                whiteSpace: 'nowrap', 
+                                overflow: 'hidden', 
+                                textOverflow: 'ellipsis',
+                                display: 'block'         // Important pour que le maxWidth fonctionne
+                              }}>
+                                {p.name}
+                              </span>
+                            )}
+                          </td>
                         {COLS.mode === "desktop" ? (
                           <>
-                            <td style={{ ...s.projectCell }}>{formatDateShort(p.createdAt)}</td>
-                            <td style={{ ...s.projectCell }}>{formatDateShort(p.updatedAt)}</td>
+                            <td style={s.projectCell}>{formatDateShort(p.createdAt)}</td>
+                            <td style={s.projectCell}>{formatDateShort(p.updatedAt)}</td>
                           </>
                         ) : (
-                          <td style={{ ...s.projectCell }}>
-                            <div style={s.metaStack}>
-                              <span>
-                                <span style={s.metaTiny}>Créé:</span> {formatDateShort(p.createdAt)}
-                              </span>
-                              <span>
-                                <span style={s.metaTiny}>Modifié:</span> {formatDateShort(p.updatedAt)}
-                              </span>
-                            </div>
-                          </td>
+                         <td style={{ ...s.projectCell, textAlign: "left" }}> 
+                          <div style={{ ...s.metaStack, alignItems: "flex-start" }}>
+                            <span><span style={s.metaTiny}>C:</span> {formatDateShort(p.createdAt)}</span>
+                            <span><span style={s.metaTiny}>M:</span> {formatDateShort(p.updatedAt)}</span>
+                          </div>
+                        </td>
                         )}
 
-                        {/* Temps total (placeholder) */}
                         <td style={{ ...s.projectCell, fontWeight: 600 }}>{getRandomTime()}</td>
 
-                        {/* Actions */}
                         <td style={{ ...s.projectCell, ...s.projectCellLast }}>
                           <div style={s.projectActions}>
                             {isEditing ? (
                               <>
-                                <button
-                                  onClick={() => saveEdit(p.id)}
-                                  style={isTablet ? s.primaryBtnSm : s.primaryBtn}
-                                >
-                                  Enregistrer
-                                </button>
-                                <button
-                                  onClick={cancelEdit}
-                                  style={isTablet ? s.ghostBtnOnDarkSm : s.ghostBtnOnDark}
-                                >
-                                  Annuler
-                                </button>
+                                <button onClick={() => saveEdit(p.id)} style={isTablet ? s.primaryBtnSm : s.primaryBtn}>Enregistrer</button>
+                                <button onClick={cancelEdit} style={isTablet ? s.ghostBtnOnDarkSm : s.ghostBtnOnDark}>Annuler</button>
                               </>
                             ) : (
                               <>
-                                <button
-                                  onClick={() => beginEdit(p)}
-                                  style={isTablet ? s.ghostBtnOnDarkSm : s.ghostBtnOnDark}
-                                >
-                                  Modifier
-                                </button>
-                                <button
-                                  onClick={() => remove(p.id)}
-                                  style={isTablet ? s.dangerBtnSm : s.dangerBtn}
-                                >
-                                  Supprimer
-                                </button>
+                                <button onClick={() => beginEdit(p)} style={isTablet ? s.ghostBtnOnDarkSm : s.ghostBtnOnDark}>Modifier</button>
+                                <button onClick={() => remove(p.id)} style={isTablet ? s.dangerBtnSm : s.dangerBtn}>Supprimer</button>
                                 <button
                                   onClick={() => setOpenProjectId(isOpen ? null : p.id)}
                                   style={isTablet ? s.secondaryBtnOnDarkSm : s.secondaryBtnOnDark}
                                 >
-                                  {isOpen ? "Fermer tâches" : "Tâches"}
+                                  {isOpen ? "Fermer" : "Tâches"}
                                 </button>
                               </>
                             )}
@@ -429,7 +434,6 @@ export default function ProjectsPanel({ userId, onCountChange }: Props) {
                         </td>
                       </tr>
 
-                      {/* Accordéon tâches */}
                       {isOpen && (
                         <tr key={`${p.id}-tasks`}>
                           <td
