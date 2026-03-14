@@ -1,4 +1,3 @@
-// src/dashboard/styles.ts
 import type React from "react";
 
 /** Classe utilitaire à appliquer sur l’input pour cibler le placeholder */
@@ -6,31 +5,27 @@ export const classes = {
   textInput: "dash-text-input",
 };
 
-// styles.ts
+// CSS global pour styler les placeholders comme l’entête "Nom"
 export const globalPlaceholderCss = `
-  /* placeholder comme l'en-tête "Nom" */
   .${classes.textInput}::placeholder,
   .${classes.textInput}::-webkit-input-placeholder,
   .${classes.textInput}::-moz-placeholder,
   .${classes.textInput}:-ms-input-placeholder,
   .${classes.textInput}::-ms-input-placeholder {
-    color: #6b7280 !important;   /* même gris que s.th.color */
-    font-weight: 600;             /* même poids que l'en-tête */
-    letter-spacing: 0.01em;       /* léger tracking, optionnel */
-    opacity: 1;                   /* Safari corrige l’opacité */
+    color: #6b7280 !important;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    opacity: 1;
   }
-
-  /* Au focus: un poil plus clair (optionnel) */
   .${classes.textInput}:focus::placeholder {
-    color: #94a3b8 !important;    /* slate-400 */
+    color: #94a3b8 !important;
     font-weight: 600;
   }
 `;
 
-
 export const s: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: 1000,
+    maxWidth: "min(1120px, 96vw)",
     margin: "40px auto",
     padding: "0 16px",
   },
@@ -62,15 +57,15 @@ export const s: Record<string, React.CSSProperties> = {
   heroTitle: { fontSize: "1.5rem", fontWeight: 700, margin: 0 },
   heroSub: { opacity: 0.85, fontSize: 14, marginTop: 2 },
 
-   topRight: {
-    marginLeft: 'auto',            // pousse à droite
-    display: 'flex',
-    alignItems: 'center',
+  topRight: {
+    marginLeft: "auto",
+    display: "flex",
+    alignItems: "center",
     gap: 12,
     flexShrink: 0,
   },
 
-  // Alerts / text
+  // Labels / alerts
   muted: { fontSize: "12px", color: "#A8B6C9" },
   alert: {
     background: "#E5EAF1",
@@ -88,7 +83,7 @@ export const s: Record<string, React.CSSProperties> = {
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    width: '100%',
+    width: "100%",
   },
 
   // Controls
@@ -104,7 +99,7 @@ export const s: Record<string, React.CSSProperties> = {
   },
 
   // Tableau
-  tableScroll: { width: "100%", overflowX: "visible" },
+  tableScroll: { width: "100%", overflowX: "auto" }, // autorise le scroll si besoin
   table: {
     width: "100%",
     borderCollapse: "separate",
@@ -120,53 +115,66 @@ export const s: Record<string, React.CSSProperties> = {
     whiteSpace: "nowrap",
   },
 
-  // Ligne de projet sombre avec coins arrondis
+  // Lignes de projet
   projectRow: { background: "#232e41ff", color: "#dbe4f0ff", borderRadius: 16 },
-  projectCell: { padding: "10px 8px", verticalAlign: "middle" },
+  projectCell: {
+    padding: "8px 8px",
+    verticalAlign: "middle",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
   projectCellFirst: { borderTopLeftRadius: 16, borderBottomLeftRadius: 16 },
   projectCellLast: { borderTopRightRadius: 16, borderBottomRightRadius: 16 },
 
-  // Conteneur des boutons d'action (desktop/table)
+  // Stack "Dates" pour tablette
+  metaStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+    lineHeight: 1.25,
+  },
+  metaTiny: { fontSize: 12, color: "rgba(255,255,255,.75)" },
+
+  // Actions (desktop/table)
   projectActions: {
-     display: 'flex', 
-    gap: "8px",
+    display: "flex",
+    gap: "6px",
     flexWrap: "wrap",
     justifyContent: "flex-end",
   },
 
-  // Boutons
+  // Boutons (taille normale)
   primaryBtn: {
     padding: "8px 12px",
     borderRadius: 8,
     height: 40,
-    display: 'inline-flex',     
-    alignItems: 'center',    
-     border: "1px solid rgba(255,255,255,.35)",
+    display: "inline-flex",
+    alignItems: "center",
+    border: "1px solid rgba(255,255,255,.35)",
     background: "#4CAF50",
     color: "#dbe4f0ff",
     cursor: "pointer",
     marginLeft: 4,
-    
   },
   dangerBtn: {
-  padding: "8px 12px",          
-  height: 40,                  
-  display: "inline-flex",     
-  alignItems: "center",         
-  borderRadius: 8,
-  border: "1px solid rgba(255,255,255,.35)",
-  background: "#C62828",
-  color: "#dbe4f0ff",
-  cursor: "pointer",
-  marginLeft: 4,
-  lineHeight: 1,                
-},
-
+    padding: "8px 12px",
+    height: 40,
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "#C62828",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
+    marginLeft: 4,
+    lineHeight: 1,
+  },
   ghostBtnOnDark: {
     padding: "8px 12px",
     height: 40,
-      display: 'inline-flex',     
-      alignItems: 'center',    
+    display: "inline-flex",
+    alignItems: "center",
     borderRadius: 8,
     border: "1px solid rgba(255,255,255,.35)",
     background: "transparent",
@@ -184,26 +192,61 @@ export const s: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     marginLeft: 4,
   },
-  outBtnOnDark: {
-    padding: "8px 12px",
+
+  // Boutons "compact" pour tablette
+  primaryBtnSm: {
+    padding: "6px 10px",
     borderRadius: 8,
+    height: 34,
+    display: "inline-flex",
+    alignItems: "center",
     border: "1px solid rgba(255,255,255,.35)",
-    background: "transparent",
-    color: "#dbe4f0ff ",
+    background: "#4CAF50",
+    color: "#dbe4f0ff",
     cursor: "pointer",
   },
-  ghostBtn: {
-    padding: "8px 12px",
+  dangerBtnSm: {
+    padding: "6px 10px",
     borderRadius: 8,
-    border: "1px solid #d1d5db",
-    background: "#fff",
-    color: "#111827",
+    height: 34,
+    display: "inline-flex",
+    alignItems: "center",
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "#C62828",
+    color: "#dbe4f0ff",
     cursor: "pointer",
-    marginLeft: 4,
+  },
+  ghostBtnOnDarkSm: {
+    padding: "6px 10px",
+    borderRadius: 8,
+    height: 34,
+    display: "inline-flex",
+    alignItems: "center",
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "#546E7A",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
+  },
+  secondaryBtnOnDarkSm: {
+    padding: "6px 10px",
+    borderRadius: 8,
+    height: 34,
+    display: "inline-flex",
+    alignItems: "center",
+    border: "1px solid rgba(255,255,255,.35)",
+    background: "#4169E1",
+    color: "#dbe4f0ff",
+    cursor: "pointer",
   },
 
   // Accordéon des tâches
-  accordionCell: { background: "#3b4861ff", borderRadius: 12, padding: 14, color: "#dbe4f0ff", marginTop: "8px" },
+  accordionCell: {
+    background: "#3b4861ff",
+    borderRadius: 12,
+    padding: 14,
+    color: "#dbe4f0ff",
+    marginTop: "8px",
+  },
   taskAddRow: { display: "flex", gap: 8, marginBottom: 10 },
   taskList: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 },
   taskItem: {
@@ -219,7 +262,7 @@ export const s: Record<string, React.CSSProperties> = {
   },
   taskLabel: { display: "flex", alignItems: "center", gap: 8 },
 
-  // ----- Mobile cards -----
+  // Mobile cards
   listReset: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 },
   projectCard: { background: "#1E293B", color: "#dbe4f0ff", borderRadius: 16, padding: 12 },
   projectName: { fontWeight: 700, fontSize: "1rem", margin: "0 0 6px 0" },
