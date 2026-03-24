@@ -4,6 +4,7 @@ import React, { Fragment } from "react";
 import s from "../dashboard/styles";
 import ProjectRow from "./ProjectRow";
 import TasksAccordion from "../tasks/TasksAccordion";
+import { projectStyles as projectS } from "../projects/style";
 
 // Garde un type local pour éviter les imports circulaires
 export type ProjectDTO = {
@@ -14,10 +15,21 @@ export type ProjectDTO = {
   updatedAt?: string | null;
 };
 
+export type TableMode = "desktop" | "tablet" | "phone" ;
+
+type Cols = {
+  dateW: number;
+  timeW: number;
+  actionsW: number;
+  mode: TableMode;
+};
+
 type Props = {
   projects: ProjectDTO[];
   loading?: boolean;
   isNarrow: boolean;
+  mode: TableMode;
+  cols: Cols;
 
   // édition
   editingId: string | null;
@@ -34,13 +46,15 @@ type Props = {
 
   // utils
   formatDateShort: (v?: string | null) => string;
-  getRandomTime: () => string; // placeholder
+  getRandomTime: () => string;
 };
 
 const ProjectTable: React.FC<Props> = ({
   projects,
   loading,
   isNarrow,
+  mode,
+  cols,
   editingId,
   editName,
   onEditNameChange,
@@ -55,16 +69,41 @@ const ProjectTable: React.FC<Props> = ({
 }) => {
   return (
     <section style={s.card}>
-      <h2 style={{ fontSize: "1.2rem", margin: "0 0 8px 0" }}>Mes projets</h2>
+      <h2 style={projectS.projectTitle}>Mes projets</h2>
+
       <div style={s.tableScroll}>
-        <table style={s.table}>
+        <table style={s.table} className="dash-table">
+          <colgroup>
+            <col style={{ width: "auto" }} />
+            {mode === "desktop" ? (
+              <>
+                <col style={{ width: cols.dateW }} />
+                <col style={{ width: cols.dateW }} />
+              </>
+            ) : (
+              <col style={{ width: cols.dateW }} />
+            )}
+            <col style={{ width: cols.timeW }} />
+            <col style={{ width: cols.actionsW }} />
+          </colgroup>
+
           <thead>
-            <tr style={{ background: "#E5EAF1" }}>
-              <th style={s.th}>Nom</th>
-              <th style={{ ...s.th, width: 220 }}>Créé le</th>
-              <th style={{ ...s.th, width: 220 }}>Modifié le</th>
-              <th style={{ ...s.th, width: 140 }}>Temps total</th>
-              <th style={{ ...s.th, width: isNarrow ? "280px" : "360px", textAlign: "center" }}>
+            <tr style={projectS.projectTableHeadRow}>
+              {mode === "desktop" ? (
+                <>
+                  <th style={s.th}>Nom</th>
+                  <th style={{ ...s.th, width: cols.dateW }}>Créé le</th>
+                  <th style={{ ...s.th, width: cols.dateW }}>Modifié le</th>
+                </>
+              ) : (
+                <>
+                  <th style={{ ...s.th, width: cols.timeW }}>Nom</th>
+                  <th style={{ ...s.th, width: cols.dateW }}>Dates</th>
+                </>
+              )}
+
+              <th style={{ ...s.th, width: cols.timeW }}>Temps total</th>
+              <th style={{ ...s.th, width: cols.actionsW, textAlign: "center" }}>
                 Actions
               </th>
             </tr>
@@ -73,7 +112,7 @@ const ProjectTable: React.FC<Props> = ({
           <tbody>
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={mode === "desktop" ? 5 : 4}>
                   <p style={{ ...s.muted, margin: "16px 0" }}>
                     {loading ? "Chargement…" : "Aucun projet pour l’instant."}
                   </p>
@@ -88,6 +127,7 @@ const ProjectTable: React.FC<Props> = ({
                   <Fragment key={p.id}>
                     <ProjectRow
                       project={p}
+                      mode={mode}
                       isEditing={isEditing}
                       editName={isEditing ? editName : ""}
                       onEditNameChange={onEditNameChange}
@@ -105,13 +145,8 @@ const ProjectTable: React.FC<Props> = ({
                     {isOpen && (
                       <tr key={`${p.id}-tasks`}>
                         <td
-                          colSpan={5}
-                          style={{
-                            padding: "0 8px 10px 8px",
-                            background: "#3b4861ff",
-                            borderBottomLeftRadius: 16,
-                            borderBottomRightRadius: 16,
-                          }}
+                          colSpan={mode === "desktop" ? 5 : 4}
+                          style={projectS.projectOpenRowCell}
                         >
                           <TasksAccordion projectId={p.id} isOpen={isOpen} />
                         </td>

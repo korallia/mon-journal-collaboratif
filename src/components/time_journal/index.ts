@@ -1,6 +1,6 @@
-export * from './types';
+export * from '../types';
 export { default as API } from './api';
-export * from './utils';
+export * from '../utils';
 export { useTimeJournal } from './hooks/useTimeJournal';
 export { default as st } from './timeStyles';
 export { default as ProgressBar } from './ui/ProgressBar';

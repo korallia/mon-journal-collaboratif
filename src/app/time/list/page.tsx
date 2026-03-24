@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 // Styles + types (avec alias @). Adapte en relatif si besoin.
 import s from '@/components/dashboard/styles';
 import st from '@/components/time_journal/timeStyles';
-import type { ProjectDTO, TaskDTO, EntryDTO } from '@/components/time_journal/types';
+import type { ProjectDTO, TaskDTO, EntryDTO } from '@/components/types';
 
 // --- API endpoints (meme shape que la page time) ---
 const API = {

@@ -24,16 +24,19 @@ export const globalPlaceholderCss = `
   .${classes.textInput}:focus::-moz-placeholder { color: #6b7280 !important; opacity: 0.5 !important; }
 `;
 
-
-
 export const s: Record<string, React.CSSProperties> = {
+  // =========================
+  // Layout global
+  // =========================
   container: {
     maxWidth: "min(1120px, 96vw)",
     margin: "40px auto",
     padding: "0 16px",
   },
 
-  // Hero/banner
+  // =========================
+  // Hero / banner
+  // =========================
   hero: {
     backgroundColor: "#232e41ff",
     color: "#FFFFFF",
@@ -42,8 +45,16 @@ export const s: Record<string, React.CSSProperties> = {
     marginBottom: 24,
     boxShadow: "0 8px 20px rgba(2, 6, 23, 0.15)",
   },
-  heroRow: { display: "flex", alignItems: "center", justifyContent: "space-between" },
-  heroLeft: { display: "flex", alignItems: "center", gap: 12 },
+  heroRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  heroLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+  },
   avatar: {
     width: 44,
     height: 44,
@@ -59,7 +70,6 @@ export const s: Record<string, React.CSSProperties> = {
   },
   heroTitle: { fontSize: "1.5rem", fontWeight: 700, margin: 0 },
   heroSub: { opacity: 0.85, fontSize: 14, marginTop: 2 },
-
   topRight: {
     marginLeft: "auto",
     display: "flex",
@@ -68,7 +78,9 @@ export const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
 
-  // Labels / alerts
+  // =========================
+  // Texte / labels / alerts
+  // =========================
   muted: { fontSize: "12px", color: "#A8B6C9" },
   alert: {
     background: "#E5EAF1",
@@ -79,7 +91,9 @@ export const s: Record<string, React.CSSProperties> = {
     marginBottom: 16,
   },
 
-  // Cards
+  // =========================
+  // Cards / surfaces
+  // =========================
   card: {
     background: "#E5EAF1",
     border: "1px solid #e5e7eb",
@@ -87,12 +101,14 @@ export const s: Record<string, React.CSSProperties> = {
     padding: 16,
     marginBottom: 16,
     width: "100%",
-    display: 'flex',
-  flexDirection: 'column', // ou row selon ton design
-  minWidth: 0, // <--- C'EST LA CLÉ
+    display: "flex",
+    flexDirection: "column", // ou row selon ton design
+    minWidth: 0, // <--- C'EST LA CLÉ
   },
 
-  // Controls
+  // =========================
+  // Controls / inputs
+  // =========================
   row: { display: "flex", gap: 8, alignItems: "center", color: "#111827" },
   input: {
     flex: 1,
@@ -104,7 +120,9 @@ export const s: Record<string, React.CSSProperties> = {
     color: "#0f172a",
   },
 
+  // =========================
   // Tableau
+  // =========================
   tableScroll: { width: "100%", overflowX: "auto" }, // autorise le scroll si besoin
   table: {
     width: "100%",
@@ -121,17 +139,29 @@ export const s: Record<string, React.CSSProperties> = {
     whiteSpace: "nowrap",
   },
 
-  // Lignes de projet
-  projectRow: { background: "#232e41ff", color: "#dbe4f0ff", borderRadius: 16 },
+  // =========================
+  // Lignes de projet / cellules
+  // =========================
+  projectRow: {
+    background: "#232e41ff",
+    color: "#dbe4f0ff",
+    borderRadius: 16,
+  },
   projectCell: {
-   padding: "12px 8px",
-    overflow: "hidden",       // Empêche le contenu de déborder
-    whiteSpace: "nowrap",    // Force le texte sur une seule ligne
-    textOverflow: "ellipsis", // Ajoute "..." si c'est trop long
+    padding: "12px 8px",
+    overflow: "hidden", 
+    whiteSpace: "nowrap", 
+    textOverflow: "ellipsis", 
     verticalAlign: "middle",
   },
-  projectCellFirst: { borderTopLeftRadius: 16, borderBottomLeftRadius: 16, },
-  projectCellLast: { borderTopRightRadius: 16, borderBottomRightRadius: 16 },
+  projectCellFirst: {
+    borderTopLeftRadius: 16,
+    borderBottomLeftRadius: 16,
+  },
+  projectCellLast: {
+    borderTopRightRadius: 16,
+    borderBottomRightRadius: 16,
+  },
 
   // Stack "Dates" pour tablette
   metaStack: {
@@ -151,7 +181,9 @@ export const s: Record<string, React.CSSProperties> = {
     justifyContent: "flex-end",
   },
 
-  // Boutons (taille normale)
+  // =========================
+  // Boutons — taille normale
+  // =========================
   primaryBtn: {
     padding: "8px 12px",
     borderRadius: 8,
@@ -200,7 +232,9 @@ export const s: Record<string, React.CSSProperties> = {
     marginLeft: 4,
   },
 
-  // Boutons "compact" pour tablette
+  // =========================
+  // Boutons — taille compacte
+  // =========================
   primaryBtnSm: {
     padding: "6px 10px",
     borderRadius: 8,
@@ -246,7 +280,9 @@ export const s: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
 
+  // =========================
   // Accordéon des tâches
+  // =========================
   accordionCell: {
     background: "#3b4861ff",
     borderRadius: 12,
@@ -255,7 +291,13 @@ export const s: Record<string, React.CSSProperties> = {
     marginTop: "8px",
   },
   taskAddRow: { display: "flex", gap: 8, marginBottom: 10 },
-  taskList: { listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 },
+  taskList: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+    display: "grid",
+    gap: 8,
+  },
   taskItem: {
     display: "flex",
     alignItems: "center",
@@ -269,42 +311,81 @@ export const s: Record<string, React.CSSProperties> = {
   },
   taskLabel: { display: "flex", alignItems: "center", gap: 8 },
 
+  // =========================
   // Mobile cards
-  listReset: { listStyle: "none", 
-  padding: 0, 
-  margin: 0, 
-  display: "grid", 
-  gap: 12,
-  gridTemplateColumns: "minmax(0, 1fr)", // FORCE la colonne à ne pas dépasser le parent
-  width: "100%",},
-  projectCard: { background: "#1E293B", 
-  color: "#dbe4f0ff", 
-  borderRadius: 16, 
-  padding: 12,
-  minWidth: 0, // <--- CRUCIAL
-  overflow: "hidden" },
+  // =========================
+  listReset: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+    display: "grid",
+    gap: 12,
+    gridTemplateColumns: "minmax(0, 1fr)", // FORCE la colonne à ne pas dépasser le parent
+    width: "100%",
+  },
+  projectCard: {
+    background: "#1E293B",
+    color: "#dbe4f0ff",
+    borderRadius: 16,
+    padding: 12,
+    minWidth: 0, 
+    overflow: "hidden",
+  },
   projectName: { fontWeight: 700, fontSize: "1rem", margin: "0 0 6px 0" },
-  metaGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 4 },
+  metaGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8,
+    marginTop: 4,
+  },
   metaLabel: { fontSize: 12, color: "rgba(255,255,255,.7)" },
   metaValue: { whiteSpace: "nowrap" },
   actionsRow: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 },
 };
 
 export default s;
-export const tabletFixes = `
+
+export const responsiveCss = `
+  /* ===== MOBILE (<= 640px) ===== */
+  @media (max-width: 640px) {
+
+    .dash-hero-row {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    .dash-hero-left {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+
+    .dash-top-right {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 8px !important;
+      width: 100% !important;
+      margin-top: 8px !important;
+      justify-items: center !important;
+    }
+
+    .dash-primary-btn,
+    .dash-ghost-btn {
+      width: 100% !important;
+      max-width: 260px;
+      justify-content: center !important;
+    }
+  }
+
+  /* ===== TABLET (641px → 1100px) ===== */
   @media (min-width: 641px) and (max-width: 1200px) {
-    /* 1. On empêche les colonnes d'avoir une taille fixe forcée */
+
     .dash-table { 
       table-layout: auto !important; 
     }
-    
-    /* 2. On réduit la police et le padding pour gagner de l'espace horizontal */
-    .dash-table th, .dash-table td {
-      font-size: 13px !important;
-      padding: 8px 4px !important;
-    }
 
-    /* 3. On empêche le texte de se chevaucher en permettant le retour à la ligne */
+
     .dash-cell-name {
       white-space: normal !important;
       min-width: 100px;

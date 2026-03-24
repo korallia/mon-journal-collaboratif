@@ -2,8 +2,8 @@
 'use client';
 import React from 'react';
 import st from '../timeStyles';
-import { EntryDTO } from '../types';
-import { formatDate, formatHours } from '../utils';
+import { EntryDTO } from '../../types';
+import { formatDate, formatHours } from '../../utils';
 import { useRouter } from 'next/navigation';
 
 

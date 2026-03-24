@@ -25,3 +25,16 @@ export function computeProgress(totalHours: number, targetHours?: number) {
   return Math.max(0, Math.min(100, Math.round(pct)));
 }
 
+ export function getRandomTime(): string {
+    const h = Math.floor(Math.random() * 10);
+    const m = Math.floor(Math.random() * 60);
+    return `${h}h ${m}m`;
+  }
+
+ export  function formatDateShort(v?: string | null) {
+      if (!v) return "—";
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return "—";
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }

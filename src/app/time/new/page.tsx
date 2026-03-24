@@ -15,7 +15,7 @@ import ProjectPicker from '../../../components/time_journal/ui/ProjectPicker';
 import EntryForm from '../../../components/time_journal/ui/EntryForm';
 import EntryList from '../../../components/time_journal/ui/EntryList';
 import  st   from '../../../components/time_journal/timeStyles';
-import { computeProgress } from '../../../components/time_journal/utils';
+import { computeProgress } from '../../../components/utils';
 export default function TimePage() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -48,19 +48,11 @@ export default function TimePage() {
     if (status === 'unauthenticated') router.push('/auth/login');
   }, [status, router]);
 
-  // Redirection vers /dashboard si aucun projet
-  useEffect(() => {
-    if (status !== 'authenticated') return;
-    if (!loadingProjects && noProjects) {
-      const t = setTimeout(() => router.push('/dashboard'), 1800);
-      return () => clearTimeout(t);
-    }
-  }, [status, loadingProjects, noProjects, router]);
+  
 
   // Progression (optionnel)
   const totalHours = entries.reduce((sum, e) => sum + (e.hoursLogged || 0), 0);
-  const targetHours = currentProject?.targetHours;
-  const progressValue = computeProgress(totalHours, targetHours);
+
 
   return (
     <div style={st.container}>
@@ -71,7 +63,7 @@ export default function TimePage() {
         currentProjectName={currentProject?.name}
         errorMsg={errorMsg}
         s={s}
-        progressValue={progressValue}
+        total_time={totalHours}
       />
 
       {/* Bloc "picker" façon dashboard */}
@@ -86,7 +78,7 @@ export default function TimePage() {
 
       {/* CTA si aucun projet */}
       {status === 'authenticated' && !loadingProjects && !hasProjects && (
-        <div style={{ ...st.card, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ ...st.card, display: 'flex', alignItems: 'center', gap: 12, }}>
           <span>Vous n’avez pas encore de projet.</span>
           <Link href="/dashboard" style={s.primaryBtn}>Créer un projet</Link>
         </div>

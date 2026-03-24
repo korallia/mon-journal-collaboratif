@@ -27,18 +27,15 @@ type Props = {
 };
 
 export default function TasksAccordion({ projectId, isOpen }: Props) {
-  const { success, error, promise } = useToast();
-  const  confirm  = useConfirm();
+  const { error, promise } = useToast();
+  const confirm = useConfirm();
 
   const [tasks, setTasks] = useState<TaskDTO[] | null>(null);
   const [newTitle, setNewTitle] = useState('');
-
-  // Édition inline
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // lazy-load à l'ouverture
   useEffect(() => {
     if (!isOpen || tasks !== null) return;
     (async () => {
@@ -49,7 +46,7 @@ export default function TasksAccordion({ projectId, isOpen }: Props) {
         setTasks(data);
       } catch (e: any) {
         setTasks([]);
-        error(e?.message ?? 'Erreur de chargement des tâches');
+        error(e?.message ?? 'Erreur de chargement');
       }
     })();
   }, [isOpen, projectId, tasks, error]);
@@ -59,31 +56,21 @@ export default function TasksAccordion({ projectId, isOpen }: Props) {
   async function addTask() {
     const title = newTitle.trim();
     if (!title) return;
-
     try {
       const created = await promise(
         fetch(TASK_API.create, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ projectId, title }),
-        }).then((r) =>
-          r.ok ? r.json() : Promise.reject(new Error('Création impossible')),
-        ),
-        { loading: 'Ajout…', success: 'Tâche ajoutée', error: 'Échec de l’ajout' },
+        }).then((r) => r.ok ? r.json() : Promise.reject(new Error('Erreur'))),
+        { loading: 'Ajout…', success: 'Tâche ajoutée', error: 'Échec' }
       );
-
       setTasks((prev) => [created as TaskDTO, ...(prev ?? [])]);
       setNewTitle('');
-    } catch {
-      // toast déjà affiché par promise()
-    }
+    } catch { }
   }
 
-  async function updateTask(
-    id: string,
-    patch: Partial<Pick<TaskDTO, 'title' | 'done'>>,
-    messages?: { loading?: string; success?: string; error?: string },
-  ) {
+  async function updateTask(id: string, patch: Partial<TaskDTO>) {
     setSaving(true);
     try {
       const updated = await promise(
@@ -91,89 +78,24 @@ export default function TasksAccordion({ projectId, isOpen }: Props) {
           method: 'PUT',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify(patch),
-        }).then((r) =>
-          r.ok ? r.json() : Promise.reject(new Error('Mise à jour impossible')),
-        ),
-        {
-          loading: messages?.loading ?? 'Enregistrement…',
-          success: messages?.success ?? 'Tâche mise à jour',
-          error: messages?.error ?? 'Échec de la mise à jour',
-        },
+        }).then((r) => r.ok ? r.json() : Promise.reject(new Error('Erreur'))),
+        { loading: 'Enregistrement…', success: 'Mis à jour', error: 'Échec' }
       );
-
       setTasks((prev) => (prev ?? []).map((t) => (t.id === id ? (updated as TaskDTO) : t)));
-      return updated as TaskDTO;
-    } catch {
-      return null;
-    } finally {
-      setSaving(false);
-    }
+      return updated;
+    } catch { return null; } finally { setSaving(false); }
   }
 
-  async function toggleDone(task: TaskDTO) {
-    await updateTask(
-      task.id,
-      { done: !task.done },
-      {
-        loading: task.done ? 'Restauration…' : 'Finalisation…',
-        success: task.done ? 'Repassée à faire' : 'Marquée terminée',
-        error: 'Échec de la modification',
-      },
-    );
-  }
-
-  async function removeTask(task: TaskDTO) {
-    const ok = await confirm({
-      title: 'Supprimer cette tâche ?',
-      description: 'Cette action est irréversible.',
-      confirmText: 'Supprimer',
-      cancelText: 'Annuler',
-      tone: 'danger',
-    });
-    if (!ok) return;
-
-    try {
-      await promise(
-        fetch(TASK_API.byId(task.id), { method: 'DELETE' }).then((r) =>
-          r.ok || r.status === 204
-            ? true
-            : Promise.reject(new Error('Suppression impossible')),
-        ),
-        { loading: 'Suppression…', success: 'Tâche supprimée', error: 'Échec de la suppression' },
-      );
-
-      setTasks((prev) => (prev ?? []).filter((t) => t.id !== task.id));
-    } catch {
-      // toast déjà géré par promise()
-    }
-  }
-
-  function startEdit(task: TaskDTO) {
-    setEditingId(task.id);
-    setEditingTitle(task.title);
-  }
-
-  function cancelEdit() {
-    setEditingId(null);
-    setEditingTitle('');
-  }
+  const startEdit = (task: TaskDTO) => { setEditingId(task.id); setEditingTitle(task.title); };
+  const cancelEdit = () => { setEditingId(null); setEditingTitle(''); };
 
   async function saveEdit(task: TaskDTO) {
     const title = editingTitle.trim();
-    if (!title || title === task.title) {
-      cancelEdit();
-      return;
-    }
-    const updated = await updateTask(task.id, { title }, {
-      loading: 'Enregistrement…',
-      success: 'Titre mis à jour',
-      error: 'Échec de la mise à jour',
-    });
-    if (updated) cancelEdit();
+    if (!title || title === task.title) { cancelEdit(); return; }
+    if (await updateTask(task.id, { title })) cancelEdit();
   }
 
-  const formatDate = (iso?: string) =>
-    iso ? new Date(iso).toLocaleString() : '';
+  const formatDate = (iso?: string) => iso ? new Date(iso).toLocaleString() : '';
 
   return (
     <div style={s.accordionCell}>
@@ -182,100 +104,87 @@ export default function TasksAccordion({ projectId, isOpen }: Props) {
           placeholder="Nouvelle tâche"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') addTask();
-          }}
+          onKeyDown={(e) => e.key === 'Enter' && addTask()}
           style={s.input}
+          className="dash-text-input"
         />
-        <button onClick={addTask} style={s.primaryBtn}>
-          Ajouter
-        </button>
+        <button onClick={addTask} style={s.primaryBtn}>Ajouter</button>
       </div>
 
       <ul style={s.taskList}>
         {(tasks ?? []).map((t) => {
           const isEditing = editingId === t.id;
-
           return (
-            <li key={t.id} style={s.taskItem}>
-              {/* Contenu de la tâche (checkbox, titre, dates) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <li key={t.id} style={{ 
+              ...s.taskItem, 
+              display: 'flex', 
+              flexDirection: 'row', 
+              flexWrap: 'wrap', // Permet le passage en dessous sur mobile
+              alignItems: 'center', 
+              justifyContent: 'space-between', 
+              gap: 16 
+            }}>
+              
+              {/* BLOC GAUCHE : Checkbox + Titre + Dates */}
+              <div style={{ flex: '1 1 280px', minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <label
-                    style={{
-                      ...s.taskLabel,
-                      margin: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={t.done}
-                      onChange={() => toggleDone(t)}
-                      disabled={saving && isEditing}
-                      style={{ marginRight: 8 }}
-                    />
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={() => updateTask(t.id, { done: !t.done })}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     {isEditing ? (
                       <input
                         autoFocus
                         value={editingTitle}
                         onChange={(e) => setEditingTitle(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveEdit(t);
-                          if (e.key === 'Escape') cancelEdit();
-                        }}
-                        style={{ ...s.input, padding: '6px 8px', width: 260 }}
+                        onKeyDown={(e) => e.key === 'Enter' ? saveEdit(t) : e.key === 'Escape' && cancelEdit()}
+                        style={{ ...s.input, width: '100%' }}
                       />
                     ) : (
                       <span
                         onDoubleClick={() => startEdit(t)}
-                        title="Double-clic pour renommer"
                         style={{
                           textDecoration: t.done ? 'line-through' : 'none',
-                          cursor: 'text',
+                          wordBreak: 'break-all', // Gère les longs textes sans espaces
+                          display: 'block'
                         }}
                       >
                         {t.title}
                       </span>
                     )}
-                  </label>
+                  </div>
                 </div>
-
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginLeft: 30 }}>
+                <div style={{ marginLeft: 28, marginTop: 4 }}>
                   <small style={s.muted}>Créée: {formatDate(t.createdAt)}</small>
-                  {t.updatedAt && (
-                    <small style={s.muted}>Modifiée: {formatDate(t.updatedAt)}</small>
-                  )}
                 </div>
               </div>
 
-              {/* Conteneur droite pour les actions */}
-              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              {/* BLOC DROITE : BOUTONS ACTIONS */}
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 'auto' }}>
                 {isEditing ? (
                   <>
                     <button onClick={() => saveEdit(t)} disabled={saving} style={s.primaryBtn}>
-                      {saving ? '…' : 'Enregistrer'}
+                      {saving ? '…' : 'OK'}
                     </button>
-                    <button onClick={cancelEdit} style={s.ghostBtnOnDark}>
-                      Annuler
-                    </button>
+                    <button onClick={cancelEdit} style={s.ghostBtnOnDark}>Annuler</button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => startEdit(t)} style={s.ghostBtnOnDark}>
-                      Renommer
-                    </button>
-                    <button onClick={() => removeTask(t)} style={s.dangerBtn}>
-                      Supprimer
-                    </button>
+                    <button onClick={() => startEdit(t)} style={s.ghostBtnOnDark}>Renommer</button>
+                    <button onClick={async () => {
+                      if (await confirm({ title: 'Supprimer ?', tone: 'danger' })) {
+                        await fetch(TASK_API.byId(t.id), { method: 'DELETE' });
+                        setTasks(prev => (prev ?? []).filter(item => item.id !== t.id));
+                      }
+                    }} style={s.dangerBtn}>Supprimer</button>
                   </>
                 )}
               </div>
             </li>
           );
         })}
-        {tasks && tasks.length === 0 && <li style={s.muted}>Aucune tâche pour ce projet.</li>}
       </ul>
     </div>
   );

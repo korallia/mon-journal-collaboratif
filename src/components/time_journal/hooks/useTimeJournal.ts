@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { ProjectDTO, TaskDTO, EntryDTO } from '../types';
+import type { ProjectDTO, TaskDTO, EntryDTO } from '../../types';
 import { useToast } from '@/components/toast/ToastProvider';
 import { useConfirm } from '@/components/confirm/ConfirmProvider';
 

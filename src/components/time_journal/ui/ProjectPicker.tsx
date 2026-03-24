@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import st from '../timeStyles';
-import { ProjectDTO } from '../types';
+import { ProjectDTO } from '../../types';
 
 type Props = {
   projects: ProjectDTO[];

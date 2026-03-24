@@ -2,10 +2,15 @@
 
 import React from "react";
 import s, { classes } from "../dashboard/styles";
+import { projectStyles as projectS } from "../projects/style";
 import type { ProjectDTO } from "./ProjectTable";
+import type { TableMode } from "./ProjectTable";
+
+
 
 type Props = {
   project: ProjectDTO;
+  mode: TableMode;
 
   // état d’édition pour CETTE ligne
   isEditing: boolean;
@@ -25,11 +30,12 @@ type Props = {
 
   // utils
   formatDateShort: (v?: string | null) => string;
-  timeTotalLabel: string; // placeholder
+  timeTotalLabel: string;
 };
 
 const ProjectRow: React.FC<Props> = ({
   project,
+  mode,
   isEditing,
   editName,
   onEditNameChange,
@@ -52,41 +58,36 @@ const ProjectRow: React.FC<Props> = ({
             value={editName}
             onChange={(e) => onEditNameChange(e.target.value)}
             className={classes.textInput}
-            style={s.input}
+           style={{ ...s.input, ...projectS.projectTableNameInput }}
           />
         ) : (
           project.name
         )}
       </td>
 
-      {/* Créé le */}
-      <td
-        style={{
-          ...s.projectCell,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          maxWidth: 220,
-        }}
-      >
-        {formatDateShort(project.createdAt)}
-      </td>
+      {/* Dates */}
+      {mode === "desktop" ? (
+        <>
+         <td style={s.projectCell}>{formatDateShort(project.createdAt)}</td>
+          <td style={s.projectCell}>{formatDateShort(project.updatedAt)}</td>
+        </>
+      ) : (
+        <td style={{ ...s.projectCell, ...projectS.projectTableDatesCell }}>
+          <div style={{ ...s.metaStack, ...projectS.projectTableDatesStack }}>
+           <span>
+              C: {formatDateShort(project.createdAt)}
+            </span>
+            <span>
+              M: {formatDateShort(project.updatedAt)}
+            </span>
+          </div>
+        </td>
+      )}
 
-      {/* Modifié le */}
-      <td
-        style={{
-          ...s.projectCell,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          maxWidth: 220,
-        }}
-      >
-        {formatDateShort(project.updatedAt)}
+      {/* Temps total */}
+      <td style={{ ...s.projectCell, ...projectS.projectTableTotal }}>
+        {timeTotalLabel}
       </td>
-
-      {/* Temps total (placeholder) */}
-      <td style={{ ...s.projectCell, fontWeight: 600 }}>{timeTotalLabel}</td>
 
       {/* Actions */}
       <td style={{ ...s.projectCell, ...s.projectCellLast }}>
@@ -101,13 +102,21 @@ const ProjectRow: React.FC<Props> = ({
         >
           {isEditing ? (
             <>
-              <button onClick={onSaveEdit} style={s.primaryBtn}>Enregistrer</button>
-              <button onClick={onCancelEdit} style={s.ghostBtnOnDark}>Annuler</button>
+              <button onClick={onSaveEdit} style={s.primaryBtn}>
+                Enregistrer
+              </button>
+              <button onClick={onCancelEdit} style={s.ghostBtnOnDark}>
+                Annuler
+              </button>
             </>
           ) : (
             <>
-              <button onClick={onBeginEdit} style={s.ghostBtnOnDark}>Modifier</button>
-              <button onClick={onRemove} style={s.dangerBtn}>Supprimer</button>
+              <button onClick={onBeginEdit} style={s.ghostBtnOnDark}>
+                Modifier
+              </button>
+              <button onClick={onRemove} style={s.dangerBtn}>
+                Supprimer
+              </button>
               <button onClick={onToggleOpen} style={s.secondaryBtnOnDark}>
                 {isOpen ? "Fermer tâches" : "Tâches"}
               </button>
